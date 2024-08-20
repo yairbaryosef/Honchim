@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Login Page</title>
+  <meta charset="UTF-8">
+	<style>
+	body {
+    margin: 0;
+    padding: 0;
+    background-image: url('../Images/login_bac.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+
+
+		.container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			height: 100vh;
+			padding: 50px;
+			box-sizing: border-box;
+		}
+
+		.card {
+			background-color: white;
+			box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+			border-radius: 25px;
+			width: 339px;
+			height: 464px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: space-between;
+			padding: 20px;
+			box-sizing: border-box;
+		}
+
+		.card h1 {
+			background-color: #0000FF;
+			color: white;
+			font-size: 40px;
+			font-weight: bold;
+			padding: 15px 30px;
+			border-radius: 50px;
+			margin-bottom: 10px;
+		}
+
+		.form-control {
+			display: flex;
+			align-items: center;
+			width: 100%;
+			height: 50px;
+			background-color: #F2F2F2;
+			border-radius: 25px;
+			margin-bottom: 20px;
+			padding: 10px;
+			box-sizing: border-box;
+		}
+
+		.form-control input {
+			flex: 1;
+			border: none;
+			background-color: transparent;
+			margin-left: 10px;
+			font-size: 16px;
+		}
+
+		.form-control i {
+			font-size: 20px;
+			color: #919191;
+		}
+
+.btn {
+			background-color: #FF5C5C;
+			color: white;
+			height:20px
+			font-size: 25px;
+			font-weight: bold;
+			padding: 10px 40px;
+			border-radius: 50px;
+			cursor: pointer;
+           margin-button: 10px;
+		}
+		.btnen{
+			background-color: #FF5C5C;
+			color: white;
+			height:20px
+
+			font-size: 25px;
+
+			padding: 10px 40px;
+			border-radius: 50px;
+			cursor: pointer;
+           margin-button: 10px;
+		}
+
+		 .card img {
+            margin-left: 10px;
+            width: 100px;
+            height: 85px;
+        }
+
+	</style>
+</head>
+<body>
+	<div class="container">
+		<form action="{{ url_for('entrance') }}" method="POST">
+		<div class="card">
+			 <h1>
+                   שיעורי עזר
+
+                </h1>
+			<div class="form-control">
+				<i class="fa fa-envelope"></i>
+				<input type="text" placeholder='תעודת זהות' name="username" >
+			</div>
+			<div class="form-control">
+				<i class="fa fa-lock"></i>
+				<input type="password" placeholder="סיסמא" name="password">
+			</div>
+
+			 <div class="btn-container">
+                    <button class="btnen" onclick="location.href='{{ url_for("entrance") }}'">כניסה</button>
+                    <button class="btn" onclick="location.href='{{ url_for("register") }}'">הרשמה</button>
+                </div><img src="../Images/about-logo.png" alt="Logo">
+		</div>
+			</form>
+	</div>
+</body>
+</html>
