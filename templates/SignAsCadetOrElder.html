@@ -1,0 +1,195 @@
+<form>
+  <meta charset="UTF-8">
+  <label for="type">Type:</label>
+  <select id="type" name="type">
+    <option value="חניך">חניך</option>
+    <option value="חונך">חונך</option>
+  </select>
+
+  <label for="year">Year:</label>
+  <input type="number" id="year" name="year">
+
+  <label for="degree">Degree:</label>
+  <input type="text" id="degree" name="degree">
+
+  <label for="university">University:</label>
+  <select id="university" name="university">
+    <!-- options will be populated dynamically -->
+  </select>
+  <button type="button" id="add-university">Add University</button>
+
+  <label for="phone">Phone:</label>
+  <input type="tel" id="phone" name="phone">
+
+  <label for="help">Help:</label>
+  <select id="help" name="help">
+    <!-- options will be populated dynamically -->
+  </select>
+  <button type="button" id="add-help">Add Help</button>
+
+  <label for="profile-picture">Profile Picture:</label>
+  <input type="file" id="profile-picture" name="profile-picture" accept="image/*">
+
+  <label for="grades">Grades:</label>
+  <input type="file" id="grades" name="grades" accept=".pdf">
+
+  <label for="description">Description:</label>
+  <textarea id="description" name="description"></textarea>
+
+  <button type="submit">Submit</button>
+</form>
+
+<!-- JavaScript code to populate university and help options -->
+<script>
+  const universitySelect = document.getElementById('university');
+  const helpSelect = document.getElementById('help');
+
+  // populate university options
+  const universities = [
+    'University 1',
+    'University 2',
+    'University 3',
+    // add more universities here
+  ];
+  universities.forEach(university => {
+    const option = document.createElement('option');
+    option.value = university;
+    option.text = university;
+    universitySelect.appendChild(option);
+  });
+
+  // populate help options
+  const helps = [
+    'Help 1',
+    'Help 2',
+    'Help 3',
+    // add more helps here
+  ];
+  helps.forEach(help => {
+    const option = document.createElement('option');
+    option.value = help;
+    option.text = help;
+    helpSelect.appendChild(option);
+  });
+
+  // add event listeners to add university and help options
+  document.getElementById('add-university').addEventListener('click', () => {
+    const newUniversity = prompt('Enter new university:');
+    if (newUniversity) {
+      const option = document.createElement('option');
+      option.value = newUniversity;
+      option.text = newUniversity;
+      universitySelect.appendChild(option);
+    }
+  });
+
+  document.getElementById('add-help').addEventListener('click', () => {
+    const newHelp = prompt('Enter new help:');
+    if (newHelp) {
+      const option = document.createElement('option');
+      option.value = newHelp;
+      option.text = newHelp;
+      helpSelect.appendChild(option);
+    }
+  });
+</script>
+
+<!-- CSS to make the form responsive on mobile devices -->
+<style>
+body{
+background-image: url('../Images/login_bac.jpg');
+}
+  form {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  label {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+  }
+
+  input[type="file"] {
+    padding: 10px 0;
+  }
+
+  button[type="button"] {
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  button[type="button"]:hover {
+    background-color: #3e8e41;
+  }
+
+  button[type="submit"] {
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  button[type="submit"]:hover {
+    background-color: #3e8e41;
+  }
+
+  /* make the form responsive on mobile devices */
+   @media (max-width: 600px) {
+    form {
+      padding: 10px;
+    }
+
+    label {
+      font-size: 14px;
+    }
+
+    input, select, textarea {
+      font-size: 14px;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+
+    button[type="button"], button[type="submit"] {
+      font-size: 14px;
+      padding: 5px 10px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    form {
+      padding: 5px;
+    }
+
+    label {
+      font-size: 12px;
+    }
+
+    input, select, textarea {
+      font-size: 12px;
+      padding: 3px;
+      margin-bottom: 5px;
+    }
+
+    button[type="button"], button[type="submit"] {
+      font-size: 12px;
+      padding: 3px 5px;
+    }
+  }
+</style>
