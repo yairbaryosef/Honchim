@@ -1,133 +1,128 @@
 <!DOCTYPE html>
-<html>
+<html lang="he"> <!-- Added language attribute for Hebrew -->
 <head>
-	<title>Login Page</title>
-  <meta charset="UTF-8">
-	<style>
-	body {
-    margin: 0;
-    padding: 0;
-    background-image: url('../Images/login_bac.jpg');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+    background-image: url('/static/Images/drawable/login_bac.jpg');
     background-size: cover;
     background-position: center;
+    font-family: Arial, sans-serif;
 }
 
 
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 50px;
+            box-sizing: border-box;
+        }
 
-		.container {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			height: 100vh;
-			padding: 50px;
-			box-sizing: border-box;
-		}
+        .card {
+            background-color: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+            border-radius: 25px;
+            width: 339px;
+            height: 464px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+        }
 
-		.card {
-			background-color: white;
-			box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
-			border-radius: 25px;
-			width: 339px;
-			height: 464px;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: space-between;
-			padding: 20px;
-			box-sizing: border-box;
-		}
+        .card h1 {
+            background-color: #0000FF;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            padding: 15px 30px;
+            border-radius: 50px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
 
-		.card h1 {
-			background-color: #0000FF;
-			color: white;
-			font-size: 40px;
-			font-weight: bold;
-			padding: 15px 30px;
-			border-radius: 50px;
-			margin-bottom: 10px;
-		}
+        .form-control {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 50px;
+            background-color: #F2F2F2;
+            border-radius: 25px;
+            margin-bottom: 20px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
 
-		.form-control {
-			display: flex;
-			align-items: center;
-			width: 100%;
-			height: 50px;
-			background-color: #F2F2F2;
-			border-radius: 25px;
-			margin-bottom: 20px;
-			padding: 10px;
-			box-sizing: border-box;
-		}
-
-		.form-control input {
-			flex: 1;
-			border: none;
-			background-color: transparent;
-			margin-left: 10px;
-			font-size: 16px;
-		}
-
-		.form-control i {
-			font-size: 20px;
-			color: #919191;
-		}
-
-.btn {
-			background-color: #FF5C5C;
-			color: white;
-			height:20px
-			font-size: 25px;
-			font-weight: bold;
-			padding: 10px 40px;
-			border-radius: 50px;
-			cursor: pointer;
-           margin-button: 10px;
-		}
-		.btnen{
-			background-color: #FF5C5C;
-			color: white;
-			height:20px
-
-			font-size: 25px;
-
-			padding: 10px 40px;
-			border-radius: 50px;
-			cursor: pointer;
-           margin-button: 10px;
-		}
-
-		 .card img {
+        .form-control input {
+            flex: 1;
+            border: none;
+            background-color: transparent;
             margin-left: 10px;
+            font-size: 16px;
+        }
+
+        .form-control i {
+            font-size: 20px;
+            color: #919191;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .btn, .btnen {
+            background-color: #FF5C5C;
+            color: white;
+            font-size: 20px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            border: none;
+            margin-bottom: 10px;
+            width: 48%; /* Each button takes up about half the width */
+        }
+
+        .btn:hover, .btnen:hover {
+            background-color: #FF3333; /* Darker shade for hover */
+        }
+
+        .card img {
+            margin-top: 20px;
             width: 100px;
             height: 85px;
         }
-
-	</style>
+    </style>
 </head>
 <body>
-	<div class="container">
-		<form action="{{ url_for('entrance') }}" method="POST">
-		<div class="card">
-			 <h1>
-                   שיעורי עזר
+    <div class="container">
+        <div class="card">
+            <h1>שיעורי עזר</h1>
+            <form action="/login" method="POST">
+    <div class="form-control">
+        <i class="fa fa-envelope"></i>
+        <input type="text" placeholder="תעודת זהות" name="username" required>
+    </div>
+    <div class="form-control">
+        <i class="fa fa-lock"></i>
+        <input type="password" placeholder="סיסמא" name="password" required>
+    </div>
+    <div class="btn-container">
+        <button class="btnen" type="submit">כניסה</button>
+        <button class="btn" type="button" onclick="location.href='/register'">הרשמה</button>
+    </div>
+</form>
 
-                </h1>
-			<div class="form-control">
-				<i class="fa fa-envelope"></i>
-				<input type="text" placeholder='תעודת זהות' name="username" >
-			</div>
-			<div class="form-control">
-				<i class="fa fa-lock"></i>
-				<input type="password" placeholder="סיסמא" name="password">
-			</div>
-
-			 <div class="btn-container">
-                    <button class="btnen" onclick="location.href='{{ url_for("entrance") }}'">כניסה</button>
-                    <button class="btn" onclick="location.href='{{ url_for("register") }}'">הרשמה</button>
-                </div><img src="../Images/about-logo.png" alt="Logo">
-		</div>
-			</form>
-	</div>
+            <img src="static/Images/about-logo.png" alt="Logo">
+        </div>
+    </div>
 </body>
 </html>
