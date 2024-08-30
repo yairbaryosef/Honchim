@@ -1,4 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for
+import json
+
+from firebase_admin import db
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import PresenterRegister.PresenterSignIn
 from Entities.Request import Request
 from werkzeug.utils import secure_filename
@@ -96,5 +99,10 @@ def entrance():
     return render_template('SignAsCadetOrElder.html')
 
 
+@app.route('/handle_request/<action>', methods=['GET'])
+def handle_request(action):
+    # Parse the request data from the URL parameter
+    request_data = json.loads(request.args.get('request'))
+    return PresenterRegister.PresenterSignIn.handle_request(request_data,action)
 if __name__ == '__main__':
     app.run(debug=True)

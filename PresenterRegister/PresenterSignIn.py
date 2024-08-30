@@ -3,6 +3,9 @@ from firebase_admin import credentials, db, storage
 from datetime import timedelta
 import os
 
+from flask import jsonify
+
+
 def initFirebase():
     # Path to your service account key JSON file
     firebase_key_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'DB', 'FirebaseKey.json'))
@@ -39,12 +42,13 @@ def saveRequest(profile_local_path, grades_local_path, type, year, degree, uni, 
 
     # Get the public URLs of the uploaded files
     profile_url = profile_blob.generate_signed_url(timedelta(days=7), method='GET')
-    grades_url = grades_blob.generate_signed_url(timedelta(days=7), method='GET', content_type='application/pdf')
-
-
+    grades_url = grades_blob.generate_signed_url(timedelta(days=7), method='GET')
+    with open("DB\id.txt",'r') as f:
+     id=f.read()
     # Create a new Request object and save it in Firebase Realtime Database
-    new_request_ref = db.reference('Requests').push()
+    new_request_ref = db.reference('Requests').child(id)
     new_request_ref.set({
+        'id':id,
         'type': type,
         'year': year,
         'degree': degree,
@@ -60,7 +64,20 @@ def saveRequest(profile_local_path, grades_local_path, type, year, degree, uni, 
     os.remove(profile_local_path)
     os.remove(grades_local_path)
 
+def handle_request(request_data,action):
+    initFirebase()
+    db.reference('Requests').child(request_data['id']).delete()
+    # Perform your logic based on action ('accept' or 'cancel')
+    if action == 'accept':
+        db.reference('Users').child(request_data['type']).child(request_data['id']).set(request_data)
+        # Handle accept logic
+        print("Accepted request:", request_data)
+    elif action == 'cancel':
+        # Handle cancel logic
+        print("Cancelled request:", request_data)
 
+    # Return a response
+    return jsonify({'status': 'success', 'action': action})
 def get_all_requests():
             initFirebase()
             # Reference to the 'Requests' node in the database

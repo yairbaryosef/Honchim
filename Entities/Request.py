@@ -1,5 +1,6 @@
 class Request:
-        def __init__(self, type, year, degree, uni, phone, help, description, profile, grades):
+        def __init__(self,id, type, year, degree, uni, phone, help, description, profile, grades):
+            self.id=id
             self.type = type
             self.year = year
             self.degree = degree
