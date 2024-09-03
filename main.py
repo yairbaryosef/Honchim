@@ -7,6 +7,8 @@ from Entities.Request import Request
 from werkzeug.utils import secure_filename
 import os
 
+from PresenterRegister import PresenterSignIn
+
 # Initialize the Flask application
 app = Flask(__name__)
 
@@ -29,16 +31,28 @@ def login():
     from flask import request
     username = request.form.get('username')
     password=request.form.get('password')
-    if username=='Admin@' and password=='Password123':
+    PresenterSignIn.initFirebase()
+    with open("DB/id.txt", 'w') as f:
+        f.write(username)
+    if username == 'Admin@' and password == 'Password123':
 
-            # For now, let's print the requests to the console (for debugging)
-            for request in  PresenterRegister.PresenterSignIn.get_all_requests():
-                print(request)
+        # For now, let's print the requests to the console (for debugging)
+        for request in PresenterRegister.PresenterSignIn.get_all_requests():
+            print(request)
 
-            # You can also pass the requests to a template to display them on a webpage
-            return render_template('ListRequests.html', requests=PresenterRegister.PresenterSignIn.get_all_requests())
+        # You can also pass the requests to a template to display them on a webpage
+        return render_template('ListRequests.html', requests=PresenterRegister.PresenterSignIn.get_all_requests())
+    elif db.reference('Users').child('חניך').child(username).get() is not None:
+        # If user exists, save the username in a file and redirect to SignIn
 
-    return redirect(url_for('SignIn'))
+        return render_template('HomePage.html')
+    elif db.reference('Users').child('חונך').child(username).get() is not None:
+        return render_template('HomePage.html')
+        # User does not exist
+
+    else:
+        # Handle the case where the user does not exist
+        return redirect(url_for('SignIn'))
 # Register route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -104,5 +118,7 @@ def handle_request(action):
     # Parse the request data from the URL parameter
     request_data = json.loads(request.args.get('request'))
     return PresenterRegister.PresenterSignIn.handle_request(request_data,action)
+
+
 if __name__ == '__main__':
     app.run(debug=True)

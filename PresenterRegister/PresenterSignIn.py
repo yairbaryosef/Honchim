@@ -2,8 +2,9 @@ import firebase_admin
 from firebase_admin import credentials, db, storage
 from datetime import timedelta
 import os
+import PresenterRegister
 
-from flask import jsonify
+from flask import jsonify, render_template, url_for, redirect
 
 
 def initFirebase():
@@ -89,10 +90,34 @@ def get_all_requests():
             # Check if there are any requests
             if all_requests:
                 # Convert the data into a list of dictionaries (if needed)
-                requests_list = list(all_requests.values())
+                requests_list = list(all_requests)
             else:
                 requests_list = []
             return requests_list
+
+def checkIfUserExist(username,password):
+    initFirebase()
+    with open("DB/id.txt", 'w') as f:
+        f.write(username)
+    if username=='Admin@' and password=='Password123':
+
+            # For now, let's print the requests to the console (for debugging)
+            for request in  PresenterRegister.PresenterSignIn.get_all_requests():
+                print(request)
+
+            # You can also pass the requests to a template to display them on a webpage
+            return render_template('ListRequests.html', requests=PresenterRegister.PresenterSignIn.get_all_requests())
+    elif db.reference('חניך').child(username).get() is not None:
+            # If user exists, save the username in a file and redirect to SignIn
+
+            return render_template('HomePage.html')
+    elif db.reference('חונך').child(username).get() is not None:
+        return render_template('HomePage.html')
+            # User does not exist
+
+    else:
+        # Handle the case where the user does not exist
+        return redirect(url_for('SignIn'))
 if __name__ == '__main__':
     # Example usage of saveRequest
     saveRequest(
