@@ -78,7 +78,7 @@ def handle_registration_form(form_data, profile_local_path=None, grades_local_pa
     if registerUser(user_id, name, password, user_type, profile_local_path, grades_local_path):
         return render_template('HomePage.html')
     else:
-        return render_template('Register.html', error="User already exists.")
+        return render_template('Register.html', error="המשתמש כבר קיים במערכת")
 
 if __name__ == '__main__':
     # Example usage of registerUser

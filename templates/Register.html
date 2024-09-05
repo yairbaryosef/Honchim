@@ -120,11 +120,43 @@
             background-color: #2e458b;
             box-shadow: none;
         }
+
+        /* Popup styles */
+        .popup {
+            display: none;
+            position: fixed;
+            z-index: 9;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f44336;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .popup-close {
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            float: right;
+        }
     </style>
 </head>
 <body>
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600' rel='stylesheet' type='text/css'>
     <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel='stylesheet'>
+
+    <!-- Error Popup -->
+    {% if error %}
+        <div id="errorPopup" class="popup">
+            <button class="popup-close" onclick="closePopup()">×</button>
+            <p>{{ error }}</p>
+        </div>
+    {% endif %}
 
     <div class="testbox">
         <h1>הרשמה</h1>
@@ -150,5 +182,19 @@
             <button type="submit" class="submit-button">הרשמה</button>
         </form>
     </div>
+
+    <script>
+        function closePopup() {
+            document.getElementById('errorPopup').style.display = 'none';
+        }
+
+        // Automatically show the popup if there's an error
+        window.onload = function() {
+            var errorPopup = document.getElementById('errorPopup');
+            if (errorPopup) {
+                errorPopup.style.display = 'block';
+            }
+        };
+    </script>
 </body>
 </html>

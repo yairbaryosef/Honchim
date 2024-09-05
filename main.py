@@ -150,3 +150,11 @@ def handle_request(action):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('error.html', message="Page not found"), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    return render_template('error.html', message="An unexpected error occurred"), 500
