@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Form</title>
+    <script>
+        function sendClassData(event) {
+            // Prevent default action of anchor tag
+            event.preventDefault();
+
+            // Gather form data
+            const studentUsername = document.getElementById('student_username').value;
+            const dateStart = document.getElementById('start-date').value;
+            const dateEnd = document.getElementById('end-date').value;
+
+            // Create a data object to send
+            const data = {
+                student_username: studentUsername,
+                dateStart: dateStart,
+                dateEnd: dateEnd
+            };
+
+            // Send data via a POST request using Fetch API
+            fetch('/SendClass', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Class added successfully!');
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</head>
+<body>
+    <form>
+        <label for="student_username">Student Name:</label>
+        <input type="text" id="student_username" name="student_username" required><br><br>
+
+        <label for="start-date">Start Date:</label>
+        <input type="datetime-local" id="start-date" name="dateStart" required><br><br>
+
+        <label for="end-date">End Date:</label>
+        <input type="datetime-local" id="end-date" name="dateEnd" required><br><br>
+
+        <!-- Use JavaScript to handle the click event -->
+        <a href="#" onclick="sendClassData(event)">Submit</a>
+    </form>
+</body>
+</html>

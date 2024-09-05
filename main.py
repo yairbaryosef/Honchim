@@ -47,14 +47,15 @@ def login():
         return render_template('ListRequests.html', requests=PresenterRegister.PresenterSignIn.get_all_requests())
     elif db.reference('Users').child('חניך').child(username).get() is not None:
         user = db.reference('Users').child('חניך').child(username).get()
-        elder = Entities.Elder.convert_request_to_specific_type(user, 'Student')
+
         with open('DB/user.json','w') as f:
             json.dump(user, f)  #
         return render_template('HomePage.html')
     elif db.reference('Users').child('חונך').child(username).get() is not None:
         user=db.reference('Users').child('חונך').child(username).get()
-        elder=Entities.Elder.convert_request_to_specific_type(user,'Elder')
-        return elder.__repr__()
+        with open('DB/user.json', 'w') as f:
+            json.dump(user, f)  #
+        return render_template('CreateClass.html')
         # User does not exist
 
     else:
@@ -131,6 +132,60 @@ def MyClasses():
     return render_template('MyClasses.html', items=students)
 
 
+@app.route('/SendClass', methods=['POST'])
+def SendClass():
+    # Initialize Firebase
+    PresenterSignIn.initFirebase()
+
+    # Parse JSON data from the request
+    data = request.get_json()
+
+    # Extract the student username and class details
+    student_username = data.get('student_username')
+    date_format = "%Y-%m-%dT%H:%M"
+    date_start = data.get('dateStart')
+    date_end = data.get('dateEnd')
+
+    if not student_username:
+        return jsonify({"error": "Student username is required"}), 400
+
+    # Get a reference to the student in the Firebase database
+    student_ref = db.reference('Users').child('חניך').child(student_username)
+
+    # Fetch current student data
+    student = student_ref.get()
+    date_start = datetime.strptime(date_start, date_format)
+    date_end = datetime.strptime(date_end, date_format)
+
+    # Reformat dates to match the desired output format
+
+    # Check if the student exists
+    if not student:
+        return jsonify({"error": "Student not found"}), 404
+    with open('DB/id.txt','r') as f:
+        teacher=f.read()
+    # Prepare the new class data to be added
+    formatted_date_start = date_start.strftime("%d/%m/%Y %I:%M %p")
+    formatted_date_end = date_end.strftime("%d/%m/%Y %I:%M %p")
+
+    # Create the new class dictionary with formatted dates
+    new_class = {
+        "teacher": teacher,
+        "dateStart": formatted_date_start,
+        "dateEnd": formatted_date_end
+    }
+
+    # Update the student's 'classes_to_approve' list
+    classes_to_approve = student.get('classes_to_aprove', [])
+    classes_to_approve.append(new_class)
+
+    # Save the updated list back to Firebase
+    student['classes_to_aprove'] = classes_to_approve
+    student_ref.set(student)
+
+    return jsonify({"message": "Class added successfully"}), 200
+
+
 @app.route('/handle_request/<action>', methods=['GET'])
 def handle_request(action):
     # Parse the request data from the URL parameter
@@ -140,6 +195,7 @@ def handle_request(action):
 @app.route('/handle_ClassAccept/<action>', methods=['GET'])
 def handle_ClassAccept(action):
     # Parse the request data from the URL parameter
+  if action == "accept":
     request_data = json.loads(request.args.get('request'))
     date_format = "%d/%m/%Y %I:%M %p"
 
@@ -149,12 +205,18 @@ def handle_ClassAccept(action):
 
     # Subtract the two dates
     time_difference = date_end - date_start
-
+    PresenterSignIn.initFirebase()
     # Display the difference
     difference_in_hours = time_difference.total_seconds() / 3600
+    print(request_data['teacher'])
+    user = db.reference('Users').child('חונך').child(request_data['teacher']).get()
+    print(user)
+    user['hours'] = user.get('hours', 0) + difference_in_hours
 
+
+    db.reference('Users').child('חונך').child(request_data['teacher']).set(user)
     return request_data
-
+  return action
 
 
 if __name__ == '__main__':
