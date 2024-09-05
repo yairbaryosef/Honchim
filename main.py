@@ -1,8 +1,9 @@
 import json
-
+from flask import Flask, render_template, request, redirect, url_for
 from firebase_admin import db
 from flask import Flask, render_template, request, redirect, url_for, jsonify
-import PresenterRegister.PresenterSignIn
+import PresenterRegister.PresenterSignIn as PresenterSignIn
+import PresenterRegister.PresenterRegister as PresenterRegister
 from Entities.Request import Request
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
@@ -36,21 +37,9 @@ def login():
         f.write(username)
 
     if username == 'Admin@' and password == 'Password123':
-
-        # For now, let's print the requests to the console (for debugging)
-        for request in PresenterRegister.PresenterSignIn.get_all_requests():
-            print(request)
-
-        # You can also pass the requests to a template to display them on a webpage
-        return render_template('ListRequests.html', requests=PresenterRegister.PresenterSignIn.get_all_requests())
-    elif db.reference('Users').child('חניך').child(username).get() is not None:
-        # If user exists, save the username in a file and redirect to SignIn
-
-        return render_template('HomePage.html')
-    elif db.reference('Users').child('חונך').child(username).get() is not None:
-        return render_template('HomePage.html')
-        # User does not exist
-
+        # Admin login
+        requests = PresenterSignIn.get_all_requests()
+        return render_template('ListRequests.html', requests=requests)
     else:
         # Check if user is a Cadet or Mentor
         user = db.reference('Users').child('חניך').child(username).get() or \
@@ -154,12 +143,10 @@ def SignIn():
 def entrance():
     return render_template('SignAsCadetOrElder.html')
 
-
 @app.route('/handle_request/<action>', methods=['GET'])
 def handle_request(action):
     request_data = json.loads(request.args.get('request'))
-    return PresenterRegister.PresenterSignIn.handle_request(request_data,action)
-
+    return PresenterSignIn.handle_request(request_data, action)
 
 if __name__ == '__main__':
     app.run(debug=True)
