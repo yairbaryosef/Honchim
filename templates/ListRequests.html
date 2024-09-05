@@ -32,13 +32,65 @@
                     <td>{{ request.help }}</td>
                     <td>{{ request.description }}</td>
                     <td><img src='{{ request.profile_url }}' alt=""></td>
-                    <td><a href="{{ request.grades_url }}">View PDF</a></td>
+                    <td><img src="{{ request.grades_url }}" alt="" onclick="showFullScreen('{{ request.grades_url }}')"></td>
+                </tr>
+                <tr>
+                    <td colspan="9" style="text-align: center; padding: 20px;">
+    <div class="action-btn-container">
+        <a class="action-btn accept-btn"
+           href="/handle_request/accept?request={{ request | tojson | urlencode }}"
+           style="background-color: #4CAF50; color: #fff; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer;">
+            Accept
+        </a>
+        <a class="action-btn cancel-btn"
+           href="/handle_request/cancel?request={{ request | tojson | urlencode }}"
+           style="background-color: #e74c3c; color: #fff; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer;">
+            Cancel
+        </a>
+    </div>
+</td>
+
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </section>
 </main>
+
+<script>
+    // Function to show the image in full screen
+    function showFullScreen(imageUrl) {
+        window.open(imageUrl, '_blank');
+    }
+
+    // Function to handle actions (Accept/Cancel) and send the full request object to the server
+    function handleAction(request, action) {
+        fetch(`/handle_request/${action}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request) // Send the full request object as JSON
+        }).then(response => {
+            if (response.ok) {
+                alert('Action successful');
+                location.reload(); // Reloads the page to reflect changes
+            } else {
+                alert('Action failed');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
+
+<script>
+    // Function to show the image in full screen
+    function showFullScreen(imageUrl) {
+        // Open the image in a new window or tab in full screen
+        window.open(imageUrl, '_blank');
+    }
+</script>
 <style>* {
     margin: 0;
     padding: 0;
