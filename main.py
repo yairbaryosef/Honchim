@@ -1,7 +1,10 @@
 import json
+from datetime import datetime
 
 from firebase_admin import db
 from flask import Flask, render_template, request, redirect, url_for, jsonify
+
+import Entities.Elder
 import PresenterRegister.PresenterSignIn
 from Entities.Request import Request
 from werkzeug.utils import secure_filename
@@ -43,11 +46,15 @@ def login():
         # You can also pass the requests to a template to display them on a webpage
         return render_template('ListRequests.html', requests=PresenterRegister.PresenterSignIn.get_all_requests())
     elif db.reference('Users').child('חניך').child(username).get() is not None:
-        # If user exists, save the username in a file and redirect to SignIn
-
+        user = db.reference('Users').child('חניך').child(username).get()
+        elder = Entities.Elder.convert_request_to_specific_type(user, 'Student')
+        with open('DB/user.json','w') as f:
+            json.dump(user, f)  #
         return render_template('HomePage.html')
     elif db.reference('Users').child('חונך').child(username).get() is not None:
-        return render_template('HomePage.html')
+        user=db.reference('Users').child('חונך').child(username).get()
+        elder=Entities.Elder.convert_request_to_specific_type(user,'Elder')
+        return elder.__repr__()
         # User does not exist
 
     else:
@@ -112,12 +119,42 @@ def SignIn():
 def entrance():
     return render_template('SignAsCadetOrElder.html')
 
+@app.route('/Classes', methods=['GET', 'POST'])
+def MyClasses():
+    with open("DB/user.json",'r') as f:
+        data = json.load(f)
+    try:
+        students=data['classes_to_aprove']
+
+    except:
+        students=[]
+    return render_template('MyClasses.html', items=students)
+
 
 @app.route('/handle_request/<action>', methods=['GET'])
 def handle_request(action):
     # Parse the request data from the URL parameter
     request_data = json.loads(request.args.get('request'))
     return PresenterRegister.PresenterSignIn.handle_request(request_data,action)
+
+@app.route('/handle_ClassAccept/<action>', methods=['GET'])
+def handle_ClassAccept(action):
+    # Parse the request data from the URL parameter
+    request_data = json.loads(request.args.get('request'))
+    date_format = "%d/%m/%Y %I:%M %p"
+
+    # Convert the strings to datetime objects
+    date_start = datetime.strptime(request_data['dateStart'].strip(), date_format)
+    date_end = datetime.strptime(request_data['dateEnd'].strip(), date_format)
+
+    # Subtract the two dates
+    time_difference = date_end - date_start
+
+    # Display the difference
+    difference_in_hours = time_difference.total_seconds() / 3600
+
+    return request_data
+
 
 
 if __name__ == '__main__':
