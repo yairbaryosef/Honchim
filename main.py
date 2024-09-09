@@ -46,6 +46,7 @@ def login():
                db.reference('Users').child('חונך').child(username).get()
 
         if user:
+            print(user)
             if check_password_hash(user['password'], password):
                 return render_template('HomePage.html')
         else:

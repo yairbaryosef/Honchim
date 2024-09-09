@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadet Sign In</title>
+    <!-- Include your form's CSS and other meta tags -->
+</head>
+<body>
+    <form action="{{ url_for('CadetSignIn') }}" method="POST" enctype="multipart/form-data">
+        <!-- Use the form structure you provided earlier, pre-select "חניך" -->
+        <label for="type">Type:</label>
+        <select id="type" name="type">
+            <option value="חונך" selected>חונך</option>
+        </select>
+
+        <label for="year">Year:</label>
+        <input type="number" id="year" name="year">
+
+        <label for="degree">Degree:</label>
+        <input type="text" id="degree" name="degree">
+
+        <label for="university">University:</label>
+        <select id="university" name="university">
+            <!-- options will be populated dynamically -->
+        </select>
+        <button type="button" id="add-university">Add University</button>
+
+        <label for="phone">Phone:</label>
+        <input type="tel" id="phone" name="phone">
+
+        <label for="help">Help:</label>
+        <select id="help" name="help">
+            <!-- options will be populated dynamically -->
+        </select>
+        <button type="button" id="add-help">Add Help</button>
+
+        <label for="profile-picture">Profile Picture:</label>
+        <input type="file" id="profile-picture" name="profile-picture" accept="image/*">
+
+        <label for="grades">Grades:</label>
+        <input type="file" id="grades" name="grades" accept="image/*">
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description"></textarea>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        // JavaScript code to populate university and help options
+        const universitySelect = document.getElementById('university');
+        const helpSelect = document.getElementById('help');
+
+        const universities = ['University 1', 'University 2', 'University 3'];
+        universities.forEach(university => {
+            const option = document.createElement('option');
+            option.value = university;
+            option.text = university;
+            universitySelect.appendChild(option);
+        });
+
+        const helps = ['Help 1', 'Help 2', 'Help 3'];
+        helps.forEach(help => {
+            const option = document.createElement('option');
+            option.value = help;
+            option.text = help;
+            helpSelect.appendChild(option);
+        });
+
+        document.getElementById('add-university').addEventListener('click', () => {
+            const newUniversity = prompt('Enter new university:');
+            if (newUniversity) {
+                const option = document.createElement('option');
+                option.value = newUniversity;
+                option.text = newUniversity;
+                universitySelect.appendChild(option);
+            }
+        });
+
+        document.getElementById('add-help').addEventListener('click', () => {
+            const newHelp = prompt('Enter new help:');
+            if (newHelp) {
+                const option = document.createElement('option');
+                option.value = newHelp;
+                option.text = newHelp;
+                helpSelect.appendChild(option);
+            }
+        });
+    </script>
+
+    <style>
+        /* Include your CSS from the provided form */
+    </style>
+</body>
+</html>
