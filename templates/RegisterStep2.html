@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration - Step 2</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url('../Images/login_bac.jpg');
+            background-size: cover;
+            background-position: center;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .testbox {
+            margin: 20px auto;
+            width: 343px;
+            border-radius: 8px;
+            background-color: #ebebeb;
+            box-shadow: 1px 2px 5px rgba(0,0,0,.31);
+            border: solid 1px #cbc9c9;
+            padding: 20px;
+        }
+
+        form {
+            margin: 0 30px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 300;
+            color: #4c4c4c;
+            text-align: center;
+            padding-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #4c4c4c;
+        }
+
+        input[type=text], input[type=file], input[type=number], input[type=tel], select, textarea {
+            width: calc(100% - 40px);
+            height: 39px;
+            border-radius: 4px;
+            background-color: #fff;
+            box-shadow: 1px 2px 5px rgba(0,0,0,.09);
+            border: solid 1px #cbc9c9;
+            padding-left: 10px;
+            margin-left: 10px;
+        }
+
+        textarea {
+            height: 80px;
+        }
+
+        .icon-container {
+            width: 30px;
+            height: 30px;
+            background-color: #3a57af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            color: white;
+            box-shadow: 1px 2px 5px rgba(0,0,0,.09);
+        }
+
+        .description {
+            font-size: 12px;
+            color: #4c4c4c;
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+
+        .button {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            padding: 6px 25px;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+            height: 35px;
+            border-radius: 5px;
+            background-color: #3a57af;
+            box-shadow: 0 3px rgba(58,87,175,.75);
+            transition: all 0.1s linear 0s;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .button:hover {
+            background-color: #2e458b;
+            box-shadow: none;
+        }
+
+        .custom-input {
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600' rel='stylesheet' type='text/css'>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel='stylesheet'>
+
+    <div class="testbox">
+        <h1>הרשמה - שלב 2</h1>
+        <form action="/register_step2" method="POST" enctype="multipart/form-data">
+            <hr>
+
+            <div class="form-group">
+                <div class="icon-container">
+                    <i class="icon-briefcase"></i>
+                </div>
+                <select name="type" id="type" required>
+                    <option value="">בחר סוג</option>
+                    <option value="חניך">חניך</option>
+                    <option value="חונך">חונך</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <div class="icon-container">
+                    <i class="icon-calendar"></i>
+                </div>
+                <input type="number" name="year" id="year" placeholder="שנה"/>
+            </div>
+
+            <div class="form-group">
+                <div class="icon-container">
+                    <i class="icon-graduation-cap"></i>
+                </div>
+                <input type="text" name="degree" id="degree" placeholder="תואר"/>
+            </div>
+
+            <div class="form-group">
+                <div class="icon-container">
+                    <i class="icon-building"></i>
+                </div>
+                <select name="university" id="university" required>
+                    <option value="">בחר מוסד לימוד</option>
+                    <option value="Ben Gurion University">Ben Gurion University</option>
+                    <option value="Tel Aviv University">Tel Aviv University</option>
+                    <option value="custom">אחר</option>
+                </select>
+                <input type="text" name="custom-university" id="custom-university" class="custom-input" placeholder="הכנס מוסד לימוד חדש"/>
+            </div>
+
+            <div class="form-group">
+                <div class="icon-container">
+                    <i class="icon-phone"></i>
+                </div>
+                <input type="tel" name="phone" id="phone" placeholder="טלפון"/>
+            </div>
+
+            <div class="form-group">
+                <div class="icon-container">
+                    <i class="icon-lightbulb"></i>
+                </div>
+                <select name="help" id="help" required>
+                    <option value="">בחר מקצוע לעזרה</option>
+                    <option value="Math">Math</option>
+                    <option value="Programming">Programming</option>
+                    <option value="custom">אחר</option>
+                </select>
+                <input type="text" name="custom-help" id="custom-help" class="custom-input" placeholder="הכנס מקצוע חדש"/>
+            </div>
+
+            <div class="form-group">
+                <div class="icon-container">
+                    <i class="icon-camera"></i>
+                </div>
+                <input type="file" name="profile-picture" id="profile-picture" accept="image/*"/>
+            </div>
+            <p class="description">העלה תמונת פרופיל (jpg, png, etc.)</p>
+
+            <div class="form-group">
+                <div class="icon-container">
+                    <i class="icon-file"></i>
+                </div>
+                <input type="file" name="grades" id="grades" accept="image/*,.pdf,.doc,.docx"/>
+            </div>
+            <p class="description">העלה מסמך ציונים (pdf, doc, docx, etc.)</p>
+
+            <div class="form-group">
+                <div class="icon-container">
+                    <i class="icon-comment"></i>
+                </div>
+                <textarea name="description" id="description" placeholder="תיאור"></textarea>
+            </div>
+
+            <button type="submit" class="button">הרשמה</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('university').addEventListener('change', function() {
+            const customInput = document.getElementById('custom-university');
+            customInput.style.display = this.value === 'custom' ? 'block' : 'none';
+        });
+
+        document.getElementById('help').addEventListener('change', function() {
+            const customInput = document.getElementById('custom-help');
+            customInput.style.display = this.value === 'custom' ? 'block' : 'none';
+        });
+    </script>
+</body>
+</html>

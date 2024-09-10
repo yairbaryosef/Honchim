@@ -23,33 +23,53 @@ def initFirebase():
         # If the app is already initialized, this will catch the error
         print("Firebase app already initialized, skipping reinitialization.")
 
-def saveRequest(profile_local_path, grades_local_path, type, year, degree, uni, phone, help, description):
+def saveRequest(profile_local_path, grades_local_path, id, name, password, type, year, degree, uni, phone, help, description):
     initFirebase()
 
     # Get the storage bucket
     bucket = storage.bucket()
 
-    # Define filenames for storage
-    profile_filename = os.path.basename(profile_local_path)
-    grades_filename = os.path.basename(grades_local_path)
+    try:
+        # Check if the files exist
+        if not os.path.exists(profile_local_path) or not os.path.exists(grades_local_path):
+            raise FileNotFoundError("One or more files were not found.")
 
-    # Create blob objects for Firebase Storage
-    profile_blob = bucket.blob(f'profiles/{profile_filename}')
-    grades_blob = bucket.blob(f'grades/{grades_filename}')
+        # Define filenames for storage
+        profile_filename = os.path.basename(profile_local_path)
+        grades_filename = os.path.basename(grades_local_path)
 
-    # Upload files to Firebase Storage
-    profile_blob.upload_from_filename(profile_local_path)
-    grades_blob.upload_from_filename(grades_local_path)
+        # Create blob objects for Firebase Storage
+        profile_blob = bucket.blob(f'profiles/{profile_filename}')
+        grades_blob = bucket.blob(f'grades/{grades_filename}')
 
-    # Get the public URLs of the uploaded files
-    profile_url = profile_blob.generate_signed_url(timedelta(days=7), method='GET')
-    grades_url = grades_blob.generate_signed_url(timedelta(days=7), method='GET')
-    with open("DB\id.txt",'r') as f:
-     id=f.read()
+        # Upload files to Firebase Storage
+        profile_blob.upload_from_filename(profile_local_path)
+        grades_blob.upload_from_filename(grades_local_path)
+
+        # Get the public URLs of the uploaded files
+        profile_url = profile_blob.generate_signed_url(timedelta(days=7), method='GET')
+        grades_url = grades_blob.generate_signed_url(timedelta(days=7), method='GET')
+    except FileNotFoundError as e:
+         # Handle the case where the files were not found
+        print(f"Error during file upload: {e}")
+        #return jsonify({'status': 'error', 'message': 'One or more files were not found.'})
+
+    # Check if the user already exists in the database
+    if not checkIfUserIdExist(id):
+        new_user = db.reference('Users').child(type).child(id)
+        new_user.set({
+            'id': id,
+            'name': name,
+            'password': password,
+            'type': 'מחכה לאישור',
+        })
+    print("User created successfully.")
     # Create a new Request object and save it in Firebase Realtime Database
+    if checkIfUserRequestExist(id):
+        return jsonify({'status': 'error', 'message': 'A request has already been made with this ID. Please wait for approval.'})
     new_request_ref = db.reference('Requests').child(id)
     new_request_ref.set({
-        'id':id,
+        'id': id,
         'type': type,
         'year': year,
         'degree': degree,
@@ -60,10 +80,13 @@ def saveRequest(profile_local_path, grades_local_path, type, year, degree, uni, 
         'profile_url': profile_url,
         'grades_url': grades_url
     })
+    print("Request saved successfully.")
 
     # Optionally, delete the local files after uploading to Firebase
-    os.remove(profile_local_path)
-    os.remove(grades_local_path)
+    #os.remove(profile_local_path)
+    #os.remove(grades_local_path)
+
+    return jsonify({'status': 'success', 'message': 'Request saved successfully.'})
 
 def handle_request(request_data,action):
     initFirebase()
@@ -94,6 +117,20 @@ def get_all_requests():
             else:
                 requests_list = []
             return requests_list
+
+def checkIfUserIdExist(id):
+    initFirebase()
+    for type in ['חניך', 'חונך']:
+        if db.reference('Users').child(type).child(id).get() is not None:
+            return True
+    return False
+    
+def checkIfUserRequestExist(id):
+    initFirebase()
+    if db.reference('Requests').child(id).get() is not None:
+        return True
+    else:
+        return False
 
 def checkIfUserExist(username,password):
     initFirebase()
