@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="he">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Cadet Home Page</title>
+    <title>דף הבית של חניך</title>
     <style>
         /* Reuse your initial styles */
         * {
@@ -75,18 +75,18 @@
         <div class="navdiv">
             <div class="logo"><a href="#">מערכת שיעורי עזר</a></div>
             <ul>
-                <li><a href="#" >Home</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="/Classes">בחירת חונך</a></li>
+                <li><a href="#">דף הבית</a></li>
+                <li><a href="#">אודות</a></li>
+                <li><a href="/search_elders">בחירת חונך</a></li>
                 <li><a href="#">השיעורים שלי</a></li>
             </ul>
-            <button><a href="#">Logout</a></button>
+            <button><a href="/logout">התנתקות</a></button>
         </div>
     </nav>
 
     <div class="home-content">
-        <h1 class="home-title">Welcome, Cadet</h1>
-        <p class="home-text">Access your lessons, search for mentors, and view your scheduled classes here.</p>
+        <h1 class="home-title">ברוך הבא, {{ name }}</h1>
+        <p class="home-text">כאן תוכל לגשת לשיעורים שלך, לחפש חונכים, ולצפות בשיעורים המתוזמנים שלך.</p>
     </div>
 
 </body>

@@ -8,6 +8,7 @@ import PresenterRegister.PresenterSignIn as PresenterSignIn
 from werkzeug.security import generate_password_hash, check_password_hash
 import traceback
 from flask import make_response
+import difflib
 
 
 # Initialize the Flask application
@@ -45,37 +46,47 @@ def logout():
 
 
 # Login route
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    username = request.form.get('username')
-    password = request.form.get('password')
-    PresenterSignIn.initFirebase()
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        PresenterSignIn.initFirebase()
 
-    with open("DB/id.txt", 'w') as f:
-        f.write(username)
+        with open("DB/id.txt", 'w') as f:
+            f.write(username)
 
-    if username == 'Admin@' and password == 'Password123':
-        requests = PresenterSignIn.get_all_requests()
-        return render_template('ListRequests.html', requests=requests)
+        if username == 'Admin@' and password == 'Password123':
+            requests = PresenterSignIn.get_all_requests()
+            return render_template('ListRequests.html', requests=requests)
 
-    user = db.reference('Users').child('חניך').child(username).get() or \
-           db.reference('Users').child('חונך').child(username).get() or \
-            db.reference('Users').child('מחכה לאישור').child(username).get()
+        user = db.reference('Users').child('חניך').child(username).get() or \
+                db.reference('Users').child('חונך').child(username).get() or \
+                db.reference('Users').child('מחכה לאישור').child(username).get()
 
-    if user and check_password_hash(user['password'], password):  # Verify hashed password
+        if not user and check_password_hash(user['password'], password):  # Verify hashed password
+            return render_template('login.html', error="Invalid username or password.")
         with open('DB/user.json', 'w') as f:
             json.dump(user, f)
         session['id'] = username
-        name = user.get('name') 
-        if 'חניך' in user:
-            return render_template('CadetHomePage.html')  # Render Cadet Home Page
-        elif 'חונך' in user:
-            return render_template('ElderHomePage.html')  # Render Elder Home Page
-        else:
-            IsPending = PresenterSignIn.checkIfUserRequestExist(username)
-            return render_template('PendingHomePage.html', name = name, status = IsPending) # Render Pending Home Page
+
+    if 'id' not in session:
+        return redirect(url_for('home'))
+    if request.method == 'GET':
+        username = session['id']
+        with open('DB/user.json', 'r') as f:
+            user = db.reference('Users').child('חניך').child(username).get() or \
+                db.reference('Users').child('חונך').child(username).get() or \
+                db.reference('Users').child('מחכה לאישור').child(username).get()
+    name = user.get('name') 
+    if 'חניך' in user or True:
+        return render_template('CadetHomePage.html', name = name)  # Render Cadet Home Page
+    elif 'חונך' in user:
+        return render_template('ElderHomePage.html')  # Render Elder Home Page
     else:
-        return render_template('login.html', error="Invalid username or password.")
+        IsPending = PresenterSignIn.checkIfUserRequestExist(username)
+        return render_template('PendingHomePage.html', name = name, status = IsPending) # Render Pending Home Page
+        
     
 # Register route
 @app.route('/register', methods=['GET', 'POST'])
@@ -247,6 +258,63 @@ def handle_ClassAccept(action):
         db.reference('Users').child('חונך').child(request_data['teacher']).set(user)
         return jsonify(request_data), 200
     return jsonify({"error": "Invalid action"}), 400
+
+def calculate_similarity(name, query):
+    # Calculate similarity ratio using difflib
+    print(name, query)
+    return difflib.SequenceMatcher(None, name.lower(), query.lower()).ratio()
+
+# Handle cadet elder pairing
+@app.route('/search_elders', methods=['GET', 'POST'])
+def search_elders():
+    if 'id' not in session:
+        return redirect(url_for('home'))
+
+    # Get all elders from the database
+    elders_ref = db.reference('Requests')
+    elders = elders_ref.get()
+
+    # Convert the elders data into a list
+    elders_list = []
+    if elders:
+        for key, elder in elders.items():
+            if elder.get('type') == 'חונך' or True:
+                elder_name = elder.get('name')
+                elder['first_name'] = elder_name.split(' ')[0] if elder_name else ''  
+                elders_list.append(elder)
+
+
+    # Handle search and filtering
+    if request.method == 'POST':
+        search_query = request.form.get('search')
+        year = request.form.get('year')
+        expertise = request.form.get('expertise')
+        degree = request.form.get('degree')
+        university = request.form.get('university')
+
+        # Filter elders based on search criteria
+        if search_query:
+
+            elders_list = [(elder, calculate_similarity(str(elder.get('name')), search_query)) for elder in elders_list]
+            elders_list = sorted(elders_list, key=lambda x: x[1], reverse=True)
+            elders_list = [elder[0] for elder in elders_list if elder[1] > 0.3]  # Filter out low similarity scores
+
+        if year:
+            elders_list = [elder for elder in elders_list if elder.get('year') == str(year)]
+
+        if expertise:
+            elders_list = [elder for elder in elders_list if expertise.lower() in elder.get('help', '').lower()]
+
+        if degree:
+            elders_list = [elder for elder in elders_list if degree.lower() in elder.get('degree', '').lower()]
+
+        if university:
+            elders_list = [elder for elder in elders_list if university.lower() in elder.get('uni', '').lower()]
+
+    return render_template('CadetSearchForElder.html', elders=elders_list)
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 # Error handlers
 @app.errorhandler(404)

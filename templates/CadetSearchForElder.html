@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>בחירת חונך</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            font-family: 'Open Sans', sans-serif;
+            direction: rtl;
+        }
+
+        .navbar {
+            background: crimson;
+            font-family: calibri;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+
+        .navdiv {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo a {
+            font-size: 35px;
+            font-weight: 600;
+            color: white;
+        }
+
+        ul {
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            list-style: none;
+            display: inline-block;
+        }
+
+        li a {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: 25px;
+        }
+
+        button {
+            background-color: black; /* Set background color to black */
+            margin-left: 10px;
+            border-radius: 10px;
+            padding: 10px;
+            width: 90px;
+            border: none;
+            cursor: pointer;
+        }
+
+        button a {
+            color: white; /* Ensure the text color contrasts with the black background */
+            font-weight: bold;
+            font-size: 15px;
+            text-decoration: none;
+        }
+
+        .search-bar button {
+            padding: 5px; /* Adjust padding to fit the icon */
+            font-size: 16px; /* Adjust font size of the icon */
+            border: none;
+            border-radius: 5px;
+            background-color: #ccc; /* Set background color for visibility */
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-bar button i {
+            font-size: 20px; /* Make sure the icon size is appropriate */
+        }
+
+        .home-content {
+            padding: 20px;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-bar input, .search-bar select, .search-bar button {
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-bar input[type="text"] {
+            width: 300px;
+        }
+
+        .elder-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            justify-items: center;
+        }
+
+        .elder-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            padding: 15px;
+            box-sizing: border-box;
+            display: grid;
+            grid-template-areas:
+                "image . name price"
+                "image . expertise ."
+                "image . school-info ."
+                "image . description ."
+                ". . . contact";
+            grid-template-columns: 2fr 1px 200px 100px;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .elder-card img {
+            grid-area: image;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid #ccc;
+        }
+
+
+        .elder-card h2 {
+            grid-area: name;
+            font-size: 18px;
+            color: #333;
+            font-weight: bold;
+            margin: 0;
+            text-align: right;
+        }
+
+        .elder-card .school-info {
+            grid-area: school-info;
+            font-size: 12px;
+            color: #666;
+            text-align: right;
+            display: flex;
+            align-items: center;
+        }
+
+        .elder-card .school-info .fa-graduation-cap {
+            margin-left: 5px; /* Space between the icon and the text */
+            font-size: 12px;  /* Make sure the icon size matches the text size */
+            color: #666; /* Optional: Match icon color with text color */
+        }
+
+
+        .elder-card .school-info span {
+            display: block;
+            color: #000;
+            margin-left: 5px;
+
+        }
+
+        .elder-card .description {
+            grid-area: description;
+            font-size: 16px;
+            color: #787067;
+            margin: 0;
+            text-align: right;
+        }
+
+        .elder-card .expertise {
+            grid-area: expertise;
+            font-weight: bold;
+            color: #36b0a8;
+            font-size: 11px;
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .elder-card .price {
+            grid-area: price;
+            font-size: 10px;
+            color: #f39c12;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .elder-card .contact {
+            grid-area: contact;
+            text-align: left;
+        }
+
+        .elder-card .contact button {
+            background-color: #1cdc53;
+            color: white;
+            padding: 3px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .elder-card .contact button:hover {
+            background-color: #d317d3;
+        }
+        
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navdiv">
+            <div class="logo"><a href="#">מערכת שיעורי עזר</a></div>
+            <ul>
+                <li><a href="/login">דף הבית</a></li>
+                <li><a href="#">אודות</a></li>
+                <li><a href="#">בחירת חונך</a></li>
+                <li><a href="#">השיעורים שלי</a></li>
+            </ul>
+            <button><a href="/logout">התנתק</a></button>
+        </div>
+    </nav>
+
+    <div class="home-content">
+        <h1 class="home-title">ברוך הבא, {{ name }}</h1>
+
+        <!-- Search and Filter Bar -->
+        <form method="POST" class="search-bar">
+            <input type="text" name="search" placeholder="חפש חונך לפי שם, תיאור, וכו'" id="search-input" value="{{ request.form.search }}">
+            <select name="year" id="year-filter">
+                <option value="">בחר שנה</option>
+                <option value="1">שנה 1</option>
+                <option value="2">שנה 2</option>
+                <option value="3">שנה 3</option>
+            </select>
+            <select name="degree" id="degree-filter">
+                <option value="">בחר תואר</option>
+                <option value="Computer Science">מדעי המחשב</option>
+                <option value="Engineering">הנדסה</option>
+                <!-- Add more degrees here -->
+            </select>
+            <select name="university" id="uni-filter">
+                <option value="">בחר מוסד לימוד</option>
+                <option value="Ben Gurion University">אוניברסיטת בן גוריון</option>
+                <option value="Tel Aviv University">אוניברסיטת תל אביב</option>
+                <!-- Add more universities here -->
+            </select>
+            <button type="submit">
+                <i class="fa-brands fa-searchengin"></i>
+            </button>
+        </form>
+
+        <!-- List of Elders -->
+        <div class="elder-list">
+            {% for elder in elders %}
+                <div class="elder-card">
+                    <h2>{{ elder.name }}</h2>
+                    <div class="school-info">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>{{ elder.uni }}</span>
+                        <span>{{ elder.degree }}</span>
+                    </div>                                    
+                    <p class="description">קצת עליי : "{{ elder.description }}"</p>
+                    <div class="expertise">מציע עזרה ב: {{ elder.help }} </div>
+                    <div class="price"> כמות שיעורים שעשה?</div>
+                    <div class="contact">
+                        <a href="/contact/{{ elder.id }}">
+                            <button>צור קשר עם {{ elder.name }}</button>
+                        </a>
+                    </div>
+                    <a href="/contact/{{ elder.id }}"> <!-- Wrap the image in a link -->
+                        <img src="{{ elder.profile_url }}" alt="Profile Picture">
+                    </a>
+                </div>
+            {% endfor %}
+        </div>        
+    </div>
+</body>
+</html>
