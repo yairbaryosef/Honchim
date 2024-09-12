@@ -27,7 +27,7 @@
             font-weight: bold;
         }
 
-        input[type="text"], input[type="datetime-local"] {
+        input[type="date"], input[type="time"] {
             width: 100%;
             padding: 10px;
             margin-bottom: 20px;
@@ -49,36 +49,56 @@
         button[type="submit"]:hover {
             background-color: #3e8e41;
         }
-
-        .success-message, .error-message {
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 5px;
-            display: none;
-        }
-
-        .success-message {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
     </style>
+
+    <script>
+        function syncEndDate() {
+            const startDate = document.getElementById('start-date');
+            const endDate = document.getElementById('end-date');
+            const startTime = document.getElementById('start-time');
+            const endTime = document.getElementById('end-time');
+
+            // Sync the date part of the end time with the start date
+            endDate.value = startDate.value;
+        }
+
+        function validateTimes() {
+            const startDate = document.getElementById('start-date').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+
+            // Get the current date in YYYY-MM-DD format
+            const currentDate = new Date().toISOString().split('T')[0];
+
+            // Validate that the start date is in the future
+            if (startDate < currentDate) {
+                alert('The start date must be in the future.');
+                return false;
+            }
+
+            // Validate that the end time is after the start time
+            if (endTime <= startTime) {
+                alert('End time must be after start time.');
+                return false;
+            }
+            return true;
+        }
+    </script>
 </head>
 <body>
-    <form method="POST" action="{{ url_for('RequestClass', elder_name=elder_name, elder_id=elder_id) }}">
+    <form method="POST" action="{{ url_for('RequestClass', elder_name=elder_name, elder_id=elder_id) }}" onsubmit="return validateTimes()">
         <h2>Request a Class with {{ elder_name }}</h2>
         
         <label for="start-date">Start Date:</label>
-        <input type="datetime-local" id="start-date" name="date_start" required>
+        <input type="date" id="start-date" name="date_start" onchange="syncEndDate()" required>
 
-        <label for="end-date">End Date:</label>
-        <input type="datetime-local" id="end-date" name="date_end" required>
+        <label for="start-time">Start Time:</label>
+        <input type="time" id="start-time" name="start_time" required>
+
+        <label for="end-time">End Time:</label>
+        <input type="time" id="end-time" name="end_time" required>
+
+        <input type="hidden" id="end-date" name="date_end">
 
         <label for="notes">Additional Notes:</label>
         <textarea id="notes" name="notes" rows="4"></textarea>
@@ -87,4 +107,3 @@
     </form>
 </body>
 </html>
-

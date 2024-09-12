@@ -74,19 +74,22 @@ def login():
         
 @app.route('/HomePage', methods=['GET', 'POST'])   
 def HomePage():
-    if 'id' not in session:
+    if 'id' not in session or not PresenterSignIn.checkIfUserIdExist(session['id']):
         return redirect(url_for('home'))
     user = db.reference('Users').child('חניך').child(session['id']).get() or \
               db.reference('Users').child('חונך').child(session['id']).get() or \
                 db.reference('Users').child('מחכה לאישור').child(session['id']).get()
     name = user.get('name')
-    if 'חניך' in user or True:
+    if 'חניך' in user:
         return render_template('CadetHomePage.html', name = name)
-    elif 'חונך' in data:
+    # TODO: FINISH חונך
+    elif 'חונך' in user:
         return render_template('ElderHomePage.html')
-    else:
+    elif 'מחכה לאישור' in user:
         IsPending = PresenterSignIn.checkIfUserRequestExist(session['id'])
         return render_template('PendingHomePage.html', name = name, status = IsPending)
+    else:
+        return render_template('error.html', message="User not found")
 # Register route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -188,6 +191,8 @@ def MyClasses():
     students = data.get('classes_to_aprove', [])
     return render_template('MyClasses.html', items=students)
 
+from datetime import datetime
+
 # Send Class route
 @app.route('/RequestClass/<elder_name>/<elder_id>', methods=['GET', 'POST'])
 def RequestClass(elder_name, elder_id):
@@ -204,19 +209,25 @@ def RequestClass(elder_name, elder_id):
     if request.method == 'POST':
         # Extract form data
         date_start = request.form.get('date_start')
-        date_end = request.form.get('date_end')
+        start_time = request.form.get('start_time')
+        end_time = request.form.get('end_time')
+
+        # Combine the date with the times
+        date_start_combined = date_start + ' ' + start_time
+        date_end_combined = date_start + ' ' + end_time  # The end date is the same as start date
+
         notes = request.form.get('notes')
 
         # Retrieve cadet ID from session
         cadet_id = session['id']
 
         # Format the dates
-        date_format = "%Y-%m-%dT%H:%M"
-        date_start = datetime.strptime(date_start, date_format)
-        date_end = datetime.strptime(date_end, date_format)
+        date_format = "%Y-%m-%d %H:%M"
+        date_start_parsed = datetime.strptime(date_start_combined, date_format)
+        date_end_parsed = datetime.strptime(date_end_combined, date_format)
 
-        formatted_date_start = date_start.strftime("%d/%m/%Y %I:%M %p")
-        formatted_date_end = date_end.strftime("%d/%m/%Y %I:%M %p")
+        formatted_date_start = date_start_parsed.strftime("%d/%m/%Y %I:%M %p")
+        formatted_date_end = date_end_parsed.strftime("%d/%m/%Y %I:%M %p")
 
         # Create the class request
         new_class = {
@@ -238,6 +249,7 @@ def RequestClass(elder_name, elder_id):
 
     # For GET requests, render the class request form
     return render_template('CreateClass.html', elder_name=elder_name, elder_id=elder_id)
+
 
 
 # Handle request route
