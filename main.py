@@ -64,30 +64,29 @@ def login():
                 db.reference('Users').child('חונך').child(username).get() or \
                 db.reference('Users').child('מחכה לאישור').child(username).get()
 
-        if not user and check_password_hash(user['password'], password):  # Verify hashed password
+        if not (user and check_password_hash(user['password'], password)):  # Verify hashed password
             return render_template('login.html', error="Invalid username or password.")
-        with open('DB/user.json', 'w') as f:
-            json.dump(user, f)
-        session['id'] = username
-
+        else:
+            session['id'] = username
+            return redirect(url_for('HomePage'))
+    
+    return render_template('login.html')
+        
+@app.route('/HomePage', methods=['GET', 'POST'])   
+def HomePage():
     if 'id' not in session:
         return redirect(url_for('home'))
-    if request.method == 'GET':
-        username = session['id']
-        with open('DB/user.json', 'r') as f:
-            user = db.reference('Users').child('חניך').child(username).get() or \
-                db.reference('Users').child('חונך').child(username).get() or \
-                db.reference('Users').child('מחכה לאישור').child(username).get()
-    name = user.get('name') 
+    user = db.reference('Users').child('חניך').child(session['id']).get() or \
+              db.reference('Users').child('חונך').child(session['id']).get() or \
+                db.reference('Users').child('מחכה לאישור').child(session['id']).get()
+    name = user.get('name')
     if 'חניך' in user or True:
-        return render_template('CadetHomePage.html', name = name)  # Render Cadet Home Page
-    elif 'חונך' in user:
-        return render_template('ElderHomePage.html')  # Render Elder Home Page
+        return render_template('CadetHomePage.html', name = name)
+    elif 'חונך' in data:
+        return render_template('ElderHomePage.html')
     else:
-        IsPending = PresenterSignIn.checkIfUserRequestExist(username)
-        return render_template('PendingHomePage.html', name = name, status = IsPending) # Render Pending Home Page
-        
-    
+        IsPending = PresenterSignIn.checkIfUserRequestExist(session['id'])
+        return render_template('PendingHomePage.html', name = name, status = IsPending)
 # Register route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
