@@ -190,47 +190,56 @@ def MyClasses():
     return render_template('MyClasses.html', items=students)
 
 # Send Class route
-@app.route('/SendClass', methods=['POST'])
-def SendClass():
-    PresenterSignIn.initFirebase()
-    data = request.get_json()
+@app.route('/RequestClass/<elder_name>/<elder_id>', methods=['GET', 'POST'])
+def RequestClass(elder_name, elder_id):
+    if 'id' not in session:
+        return redirect(url_for('home'))
 
-    student_username = data.get('student_username')
-    date_format = "%Y-%m-%dT%H:%M"
-    date_start = data.get('dateStart')
-    date_end = data.get('dateEnd')
+    # Fetch the elder's details using the elder_id
+    elder_ref = db.reference('Users').child('חונך').child(elder_id)
+    elder = elder_ref.get()
 
-    if not student_username:
-        return jsonify({"error": "Student username is required"}), 400
+    if not elder or elder.get('name') != elder_name:
+        return render_template('error.html', message="Elder not found")
 
-    student_ref = db.reference('Users').child('חניך').child(student_username)
-    student = student_ref.get()
+    if request.method == 'POST':
+        # Extract form data
+        date_start = request.form.get('date_start')
+        date_end = request.form.get('date_end')
+        notes = request.form.get('notes')
 
-    if not student:
-        return jsonify({"error": "Student not found"}), 404
+        # Retrieve cadet ID from session
+        cadet_id = session['id']
 
-    date_start = datetime.strptime(date_start, date_format)
-    date_end = datetime.strptime(date_end, date_format)
+        # Format the dates
+        date_format = "%Y-%m-%dT%H:%M"
+        date_start = datetime.strptime(date_start, date_format)
+        date_end = datetime.strptime(date_end, date_format)
 
-    with open('DB/id.txt', 'r') as f:
-        teacher = f.read()
+        formatted_date_start = date_start.strftime("%d/%m/%Y %I:%M %p")
+        formatted_date_end = date_end.strftime("%d/%m/%Y %I:%M %p")
 
-    formatted_date_start = date_start.strftime("%d/%m/%Y %I:%M %p")
-    formatted_date_end = date_end.strftime("%d/%m/%Y %I:%M %p")
+        # Create the class request
+        new_class = {
+            "teacher": elder_id,
+            "dateStart": formatted_date_start,
+            "dateEnd": formatted_date_end,
+            "student": cadet_id,
+            "notes": notes,
+            "status": "pending"
+        }
 
-    new_class = {
-        "teacher": teacher,
-        "dateStart": formatted_date_start,
-        "dateEnd": formatted_date_end
-    }
+        # Save the request to the elder's record
+        if 'class_requests' not in elder:
+            elder['class_requests'] = []
+        elder['class_requests'].append(new_class)
+        elder_ref.set(elder)
 
-    classes_to_approve = student.get('classes_to_aprove', [])
-    classes_to_approve.append(new_class)
+        return render_template('request_class_success.html', elder=elder)
 
-    student['classes_to_aprove'] = classes_to_approve
-    student_ref.set(student)
+    # For GET requests, render the class request form
+    return render_template('CreateClass.html', elder_name=elder_name, elder_id=elder_id)
 
-    return jsonify({"message": "Class added successfully"}), 200
 
 # Handle request route
 @app.route('/handle_request/<action>', methods=['GET'])
@@ -271,7 +280,7 @@ def search_elders():
         return redirect(url_for('home'))
 
     # Get all elders from the database
-    elders_ref = db.reference('Requests')
+    elders_ref = db.reference('Users').child('חונך')
     elders = elders_ref.get()
 
     # Convert the elders data into a list
