@@ -1,67 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<title>Student Form</title>
-	<style>
-		/* Add some basic styling to the form */
-		body {
-			font-family: Arial, sans-serif;
-			background-color: #f9f9f9;
-		}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Class</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .form-container {
+            max-width: 500px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        input[type="text"], input[type="datetime-local"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, input[type="datetime-local"]:focus {
+            border-color: #28a745;
+            outline: none;
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.2);
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .loading {
+            cursor: not-allowed;
+        }
+        .message {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Create a New Class</h1>
+        <form id="classForm">
+            <label for="student_username">Student Name:</label>
+            <input type="text" id="student_username" name="student_username" placeholder="Enter your name" required>
 
-		form {
-			width: 50%;
-			margin: 40px auto;
-			padding: 20px;
-			background-color: #fff;
-			border: 1px solid #ddd;
-			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-		}
+            <label for="start-date">Start Date:</label>
+            <input type="datetime-local" id="start-date" name="dateStart" required>
 
-		label {
-			display: block;
-			margin-bottom: 10px;
-		}
+            <label for="end-date">End Date:</label>
+            <input type="datetime-local" id="end-date" name="dateEnd" required>
 
-		input[type="text"], input[type="date"] {
-			width: 100%;
-			padding: 10px;
-			margin-bottom: 20px;
-			border: 1px solid #ccc;
-		}
-
-		button[type="submit"] {
-			background-color: #4CAF50;
-			color: #fff;
-			padding: 10px 20px;
-			border: none;
-			border-radius: 5px;
-			cursor: pointer;
-		}
-
-		button[type="submit"]:hover {
-			background-color: #3e8e41;
-		}
-	</style>
+            <button type="submit">Submit</button>
+        </form>
+        <div id="formMessage" class="message"></div>
+    </div>
 
     <script>
-        function sendClassData(event) {
-            // Prevent default action of anchor tag
+        document.getElementById('classForm').addEventListener('submit', function(event) {
             event.preventDefault();
 
-            // Gather form data
+            // Disable button and show loading state
+            const submitButton = event.target.querySelector('button');
+            submitButton.disabled = true;
+            submitButton.classList.add('loading');
+            submitButton.textContent = 'Submitting...';
+
             const studentUsername = document.getElementById('student_username').value;
             const dateStart = document.getElementById('start-date').value;
             const dateEnd = document.getElementById('end-date').value;
 
-            // Create a data object to send
             const data = {
                 student_username: studentUsername,
                 dateStart: dateStart,
                 dateEnd: dateEnd
             };
 
-            // Send data via a POST request using Fetch API
             fetch('/SendClass', {
                 method: 'POST',
                 headers: {
@@ -71,28 +117,21 @@
             })
             .then(response => response.json())
             .then(data => {
-                alert('Class added successfully!');
+                document.getElementById('formMessage').innerHTML = '<p class="success">Class added successfully!</p>';
                 console.log('Success:', data);
+                document.getElementById('classForm').reset(); // Clear form
             })
             .catch((error) => {
                 console.error('Error:', error);
+                document.getElementById('formMessage').innerHTML = '<p class="error">An error occurred while adding the class.</p>';
+            })
+            .finally(() => {
+                // Re-enable button and reset text
+                submitButton.disabled = false;
+                submitButton.classList.remove('loading');
+                submitButton.textContent = 'Submit';
             });
-        }
+        });
     </script>
-</head>
-<body>
-    <form>
-        <label for="student_username">Student Name:</label>
-        <input type="text" id="student_username" name="student_username" required><br><br>
-
-        <label for="start-date">Start Date:</label>
-        <input type="datetime-local" id="start-date" name="dateStart" required><br><br>
-
-        <label for="end-date">End Date:</label>
-        <input type="datetime-local" id="end-date" name="dateEnd" required><br><br>
-
-        <!-- Use JavaScript to handle the click event -->
-        <a href="#" onclick="sendClassData(event)">Submit</a>
-    </form>
 </body>
 </html>
