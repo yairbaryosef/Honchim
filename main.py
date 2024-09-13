@@ -1,19 +1,19 @@
 import json
 from datetime import datetime
-
 from firebase_admin import db
-from flask import Flask, render_template, request, redirect, url_for, jsonify
-
-import Entities.Elder
-import PresenterRegister.PresenterSignIn
-from Entities.Request import Request
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 from werkzeug.utils import secure_filename
 import os
+import PresenterRegister.PresenterSignIn as PresenterSignIn
+from werkzeug.security import generate_password_hash, check_password_hash
+import traceback
+from flask import make_response
+import difflib
 
-from PresenterRegister import PresenterSignIn
 
 # Initialize the Flask application
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # Required for session management
 
 # Configuration for file uploads
 UPLOAD_FOLDER = 'uploads'
@@ -23,201 +23,328 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
+@app.after_request
+def add_header(response):
+    response.cache_control.no_store = True
+    response.cache_control.no_cache = True
+    response.cache_control.must_revalidate = True
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
 # Home route
 @app.route('/', methods=['GET', 'POST'])
 def home():
-
     return render_template('login.html')
 
-@app.route('/login', methods=['POST'])
+
+# Logout route
+@app.route('/logout')
+def logout():
+    session.clear()  # Clear the session
+    return redirect(url_for('home'))
+
+
+# Login route
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    from flask import request
-    username = request.form.get('username')
-    password=request.form.get('password')
-    PresenterSignIn.initFirebase()
-    with open("DB/id.txt", 'w') as f:
-        f.write(username)
-    if username == 'Admin@' and password == 'Password123':
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        PresenterSignIn.initFirebase()
 
-        # For now, let's print the requests to the console (for debugging)
-        for request in PresenterRegister.PresenterSignIn.get_all_requests():
-            print(request)
+        with open("DB/id.txt", 'w') as f:
+            f.write(username)
 
-        # You can also pass the requests to a template to display them on a webpage
-        return render_template('ListRequests.html', requests=PresenterRegister.PresenterSignIn.get_all_requests())
-    elif db.reference('Users').child('חניך').child(username).get() is not None:
-        user = db.reference('Users').child('חניך').child(username).get()
+        if username == 'Admin@' and password == 'Password123':
+            requests = PresenterSignIn.get_all_requests()
+            return render_template('ListRequests.html', requests=requests)
 
-        with open('DB/user.json','w') as f:
-            json.dump(user, f)  #
-        return render_template('HomePage.html')
-    elif db.reference('Users').child('חונך').child(username).get() is not None:
-        user=db.reference('Users').child('חונך').child(username).get()
-        with open('DB/user.json', 'w') as f:
-            json.dump(user, f)  #
-        return render_template('CreateClass.html')
-        # User does not exist
+        user = db.reference('Users').child('חניך').child(username).get() or \
+                db.reference('Users').child('חונך').child(username).get() or \
+                db.reference('Users').child('מחכה לאישור').child(username).get()
 
+        if not (user and check_password_hash(user['password'], password)):  # Verify hashed password
+            return render_template('login.html', error="Invalid username or password.")
+        else:
+            session['id'] = username
+            return redirect(url_for('HomePage'))
+    
+    return render_template('login.html')
+        
+@app.route('/HomePage', methods=['GET', 'POST'])   
+def HomePage():
+    if 'id' not in session or not PresenterSignIn.checkIfUserIdExist(session['id']):
+        return redirect(url_for('home'))
+    user = db.reference('Users').child('חניך').child(session['id']).get() or \
+              db.reference('Users').child('חונך').child(session['id']).get() or \
+                db.reference('Users').child('מחכה לאישור').child(session['id']).get()
+    name = user.get('name')
+    if 'חניך' in user:
+        return render_template('CadetHomePage.html', name = name)
+    # TODO: FINISH חונך
+    elif 'חונך' in user:
+        return render_template('ElderHomePage.html')
+    elif 'מחכה לאישור' in user:
+        IsPending = PresenterSignIn.checkIfUserRequestExist(session['id'])
+        return render_template('PendingHomePage.html', name = name, status = IsPending)
     else:
-        # Handle the case where the user does not exist
-        return redirect(url_for('SignIn'))
+        return render_template('error.html', message="User not found")
 # Register route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    return render_template('RegisterStep1.html')
 
-    return render_template('Register.html')
-
-# SignIn route
-@app.route('/SignIn', methods=['GET', 'POST'])
-def SignIn():
+# Register route
+@app.route('/register_step1', methods=['GET', 'POST'])
+def register1():
     if request.method == 'POST':
-        # Get form data
-        type = request.form['type']
-        year = request.form['year']
-        degree = request.form['degree']
-        uni = request.form['university']
-        phone = request.form['phone']
-        help = request.form['help']
-        description = request.form['description']
+        try:
+            # Store first part of the registration data in session
+            session['id'] = request.form['id']
+            if PresenterSignIn.checkIfUserIdExist(session['id']):
+                return render_template('RegisterStep1.html', error="User ID already exists.")
+            session['name'] = request.form['name']
+            session['password'] = generate_password_hash(request.form['password'])  # Hashing the password
+            return redirect(url_for('register2'))
+        except Exception as e:
+            print(f"Error during registration step 1: {e}")
+            return render_template('error.html', message="There was an error processing your registration.")
 
-        # Handle file uploads
-        profile_picture = request.files['profile-picture']
-        grades = request.files['grades']
+    return render_template('RegisterStep1.html')
 
-        # Secure and save the uploaded files locally first
-        profile_filename = secure_filename(profile_picture.filename)
-        grades_filename = secure_filename(grades.filename)
+# Second step of registration
+@app.route('/register_step2', methods=['GET', 'POST'])
+def register2():
+    if request.method == 'POST':
+        try:
+            # Extract form data
+            form_data = {
+                'id': session['id'],
+                'name': session['name'],
+                'password': session['password'],
+                'type': request.form['type'],
+                'year': request.form['year'],
+                'degree': request.form['degree'],
+                'uni': request.form['university'],
+                'phone': request.form['phone'],
+                'help': request.form['help'],
+                'description': request.form['description']
+            }
 
-        # Define paths for local saving (this is temporary, just before upload)
-        profile_local_path = os.path.join(app.config['UPLOAD_FOLDER'], profile_filename)
-        grades_local_path = os.path.join(app.config['UPLOAD_FOLDER'], grades_filename)
+            # Handle file uploads, check if the files were uploaded
+            profile_picture = request.files.get('profile-picture')
+            grades = request.files.get('grades')
 
-        # Save files locally
-        profile_picture.save(profile_local_path)
-        grades.save(grades_local_path)
+            profile_local_path = None
+            grades_local_path = None
 
-        # Upload files to Firebase Storage and save request data in Firebase Realtime Database
-        PresenterRegister.PresenterSignIn.saveRequest(
-            profile_local_path=profile_local_path,
-            grades_local_path=grades_local_path,
-            type=type,
-            year=year,
-            degree=degree,
-            uni=uni,
-            phone=phone,
-            help=help,
-            description=description
-        )
+            if profile_picture:
+                profile_filename = secure_filename(profile_picture.filename)
+                profile_local_path = os.path.join(app.config['UPLOAD_FOLDER'], profile_filename)
+                profile_picture.save(profile_local_path)
+            else:
+                return render_template('RegisterStep2.html', error="Profile picture is required.")
 
-        # Redirect to the SignIn page after form submission
-        return redirect(url_for('SignIn'))
+            if grades:
+                grades_filename = secure_filename(grades.filename)
+                grades_local_path = os.path.join(app.config['UPLOAD_FOLDER'], grades_filename)
+                grades.save(grades_local_path)
+            else:
+                return render_template('RegisterStep2.html', error="Grades file is required.")
 
-    # If GET request, render the form page
-    return render_template('SignAsCadetOrElder.html')
+            # Save the request for admin approval
+            response = PresenterSignIn.saveRequest(profile_local_path, grades_local_path, **form_data)
 
-# Entrance route
-@app.route('/entrance', methods=['POST'])
-def entrance():
-    return render_template('SignAsCadetOrElder.html')
+            # Check response and handle error if a request already exists
+            if response.get_json()['status'] == 'error':
+                print(f"Error during registration step 2: {response.get_json()['message']}")
+                return render_template('RegisterStep2.html', error=response.get_json()['message'])
 
+            # Clear session data after saving the request
+            type = form_data['type']
+            session.clear()
+
+            print(f"Registration successful for {form_data['name']} with ID {form_data['id']}")
+
+            # only for testing
+            if type == 'חניך':
+                return render_template('PendingHomePage.html')
+            elif type == 'חונך':
+                return render_template('ElderHomePage.html')
+            # End of testing
+            return redirect(url_for('home'))
+        except Exception:
+            print(f"Error during registration step 2: {traceback.format_exc()}")
+            return render_template('error.html', message="There was an error processing your registration.")
+
+    print("Session data:", session)
+    return render_template('RegisterStep2.html')
+
+
+
+# Classes route
 @app.route('/Classes', methods=['GET', 'POST'])
 def MyClasses():
-    with open("DB/user.json",'r') as f:
+    with open("DB/user.json", 'r') as f:
         data = json.load(f)
-    try:
-        students=data['classes_to_aprove']
-
-    except:
-        students=[]
+    students = data.get('classes_to_aprove', [])
     return render_template('MyClasses.html', items=students)
 
+from datetime import datetime
 
-@app.route('/SendClass', methods=['POST'])
-def SendClass():
-    # Initialize Firebase
-    PresenterSignIn.initFirebase()
+# Send Class route
+@app.route('/RequestClass/<elder_name>/<elder_id>', methods=['GET', 'POST'])
+def RequestClass(elder_name, elder_id):
+    if 'id' not in session:
+        return redirect(url_for('home'))
 
-    # Parse JSON data from the request
-    data = request.get_json()
+    # Fetch the elder's details using the elder_id
+    elder_ref = db.reference('Users').child('חונך').child(elder_id)
+    elder = elder_ref.get()
 
-    # Extract the student username and class details
-    student_username = data.get('student_username')
-    date_format = "%Y-%m-%dT%H:%M"
-    date_start = data.get('dateStart')
-    date_end = data.get('dateEnd')
+    if not elder or elder.get('name') != elder_name:
+        return render_template('error.html', message="Elder not found")
 
-    if not student_username:
-        return jsonify({"error": "Student username is required"}), 400
+    if request.method == 'POST':
+        # Extract form data
+        date_start = request.form.get('date_start')
+        start_time = request.form.get('start_time')
+        end_time = request.form.get('end_time')
 
-    # Get a reference to the student in the Firebase database
-    student_ref = db.reference('Users').child('חניך').child(student_username)
+        # Combine the date with the times
+        date_start_combined = date_start + ' ' + start_time
+        date_end_combined = date_start + ' ' + end_time  # The end date is the same as start date
 
-    # Fetch current student data
-    student = student_ref.get()
-    date_start = datetime.strptime(date_start, date_format)
-    date_end = datetime.strptime(date_end, date_format)
+        notes = request.form.get('notes')
 
-    # Reformat dates to match the desired output format
+        # Retrieve cadet ID from session
+        cadet_id = session['id']
 
-    # Check if the student exists
-    if not student:
-        return jsonify({"error": "Student not found"}), 404
-    with open('DB/id.txt','r') as f:
-        teacher=f.read()
-    # Prepare the new class data to be added
-    formatted_date_start = date_start.strftime("%d/%m/%Y %I:%M %p")
-    formatted_date_end = date_end.strftime("%d/%m/%Y %I:%M %p")
+        # Format the dates
+        date_format = "%Y-%m-%d %H:%M"
+        date_start_parsed = datetime.strptime(date_start_combined, date_format)
+        date_end_parsed = datetime.strptime(date_end_combined, date_format)
 
-    # Create the new class dictionary with formatted dates
-    new_class = {
-        "teacher": teacher,
-        "dateStart": formatted_date_start,
-        "dateEnd": formatted_date_end
-    }
+        formatted_date_start = date_start_parsed.strftime("%d/%m/%Y %I:%M %p")
+        formatted_date_end = date_end_parsed.strftime("%d/%m/%Y %I:%M %p")
 
-    # Update the student's 'classes_to_approve' list
-    classes_to_approve = student.get('classes_to_aprove', [])
-    classes_to_approve.append(new_class)
+        # Create the class request
+        new_class = {
+            "teacher": elder_id,
+            "dateStart": formatted_date_start,
+            "dateEnd": formatted_date_end,
+            "student": cadet_id,
+            "notes": notes,
+            "status": "pending"
+        }
 
-    # Save the updated list back to Firebase
-    student['classes_to_aprove'] = classes_to_approve
-    student_ref.set(student)
+        # Save the request to the elder's record
+        if 'class_requests' not in elder:
+            elder['class_requests'] = []
+        elder['class_requests'].append(new_class)
+        elder_ref.set(elder)
 
-    return jsonify({"message": "Class added successfully"}), 200
+        return render_template('request_class_success.html', elder=elder)
+
+    # For GET requests, render the class request form
+    return render_template('CreateClass.html', elder_name=elder_name, elder_id=elder_id)
 
 
+
+# Handle request route
 @app.route('/handle_request/<action>', methods=['GET'])
 def handle_request(action):
-    # Parse the request data from the URL parameter
     request_data = json.loads(request.args.get('request'))
-    return PresenterRegister.PresenterSignIn.handle_request(request_data,action)
+    return PresenterSignIn.handle_request(request_data, action)
 
+# Handle Class Accept route
 @app.route('/handle_ClassAccept/<action>', methods=['GET'])
 def handle_ClassAccept(action):
-    # Parse the request data from the URL parameter
-  if action == "accept":
-    request_data = json.loads(request.args.get('request'))
-    date_format = "%d/%m/%Y %I:%M %p"
+    if action == "accept":
+        request_data = json.loads(request.args.get('request'))
+        date_format = "%d/%m/%Y %I:%M %p"
 
-    # Convert the strings to datetime objects
-    date_start = datetime.strptime(request_data['dateStart'].strip(), date_format)
-    date_end = datetime.strptime(request_data['dateEnd'].strip(), date_format)
+        date_start = datetime.strptime(request_data['dateStart'].strip(), date_format)
+        date_end = datetime.strptime(request_data['dateEnd'].strip(), date_format)
 
-    # Subtract the two dates
-    time_difference = date_end - date_start
-    PresenterSignIn.initFirebase()
-    # Display the difference
-    difference_in_hours = time_difference.total_seconds() / 3600
-    print(request_data['teacher'])
-    user = db.reference('Users').child('חונך').child(request_data['teacher']).get()
-    print(user)
-    user['hours'] = user.get('hours', 0) + difference_in_hours
+        time_difference = date_end - date_start
+        difference_in_hours = time_difference.total_seconds() / 3600
+
+        PresenterSignIn.initFirebase()
+        user = db.reference('Users').child('חונך').child(request_data['teacher']).get()
+        user['hours'] = user.get('hours', 0) + difference_in_hours
+
+        db.reference('Users').child('חונך').child(request_data['teacher']).set(user)
+        return jsonify(request_data), 200
+    return jsonify({"error": "Invalid action"}), 400
+
+def calculate_similarity(name, query):
+    # Calculate similarity ratio using difflib
+    print(name, query)
+    return difflib.SequenceMatcher(None, name.lower(), query.lower()).ratio()
+
+# Handle cadet elder pairing
+@app.route('/search_elders', methods=['GET', 'POST'])
+def search_elders():
+    if 'id' not in session:
+        return redirect(url_for('home'))
+
+    # Get all elders from the database
+    elders_ref = db.reference('Users').child('חונך')
+    elders = elders_ref.get()
+
+    # Convert the elders data into a list
+    elders_list = []
+    if elders:
+        for key, elder in elders.items():
+            if elder.get('type') == 'חונך' or True:
+                elder_name = elder.get('name')
+                elder['first_name'] = elder_name.split(' ')[0] if elder_name else ''  
+                elders_list.append(elder)
 
 
-    db.reference('Users').child('חונך').child(request_data['teacher']).set(user)
-    return request_data
-  return action
+    # Handle search and filtering
+    if request.method == 'POST':
+        search_query = request.form.get('search')
+        year = request.form.get('year')
+        expertise = request.form.get('expertise')
+        degree = request.form.get('degree')
+        university = request.form.get('university')
 
+        # Filter elders based on search criteria
+        if search_query:
 
+            elders_list = [(elder, calculate_similarity(str(elder.get('name')), search_query)) for elder in elders_list]
+            elders_list = sorted(elders_list, key=lambda x: x[1], reverse=True)
+            elders_list = [elder[0] for elder in elders_list if elder[1] > 0.3]  # Filter out low similarity scores
+
+        if year:
+            elders_list = [elder for elder in elders_list if elder.get('year') == str(year)]
+
+        if expertise:
+            elders_list = [elder for elder in elders_list if expertise.lower() in elder.get('help', '').lower()]
+
+        if degree:
+            elders_list = [elder for elder in elders_list if degree.lower() in elder.get('degree', '').lower()]
+
+        if university:
+            elders_list = [elder for elder in elders_list if university.lower() in elder.get('uni', '').lower()]
+
+    return render_template('CadetSearchForElder.html', elders=elders_list)
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+# Error handlers
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('error.html', message="Page not found"), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    return render_template('error.html', message="An unexpected error occurred"), 500
+
+# Run the Flask app
 if __name__ == '__main__':
     app.run(debug=True)
