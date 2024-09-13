@@ -1,98 +1,109 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Student Form</title>
-	<style>
-		/* Add some basic styling to the form */
-		body {
-			font-family: Arial, sans-serif;
-			background-color: #f9f9f9;
-		}
+    <title>Request a Class</title>
+    <style>
+        /* Basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
 
-		form {
-			width: 50%;
-			margin: 40px auto;
-			padding: 20px;
-			background-color: #fff;
-			border: 1px solid #ddd;
-			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-		}
+        form {
+            width: 50%;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
 
-		label {
-			display: block;
-			margin-bottom: 10px;
-		}
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
 
-		input[type="text"], input[type="date"] {
-			width: 100%;
-			padding: 10px;
-			margin-bottom: 20px;
-			border: 1px solid #ccc;
-		}
+        input[type="date"], input[type="time"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
 
-		button[type="submit"] {
-			background-color: #4CAF50;
-			color: #fff;
-			padding: 10px 20px;
-			border: none;
-			border-radius: 5px;
-			cursor: pointer;
-		}
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
 
-		button[type="submit"]:hover {
-			background-color: #3e8e41;
-		}
-	</style>
+        button[type="submit"]:hover {
+            background-color: #3e8e41;
+        }
+    </style>
 
     <script>
-        function sendClassData(event) {
-            // Prevent default action of anchor tag
-            event.preventDefault();
+        function syncEndDate() {
+            const startDate = document.getElementById('start-date');
+            const endDate = document.getElementById('end-date');
+            const startTime = document.getElementById('start-time');
+            const endTime = document.getElementById('end-time');
 
-            // Gather form data
-            const studentUsername = document.getElementById('student_username').value;
-            const dateStart = document.getElementById('start-date').value;
-            const dateEnd = document.getElementById('end-date').value;
+            // Sync the date part of the end time with the start date
+            endDate.value = startDate.value;
+        }
 
-            // Create a data object to send
-            const data = {
-                student_username: studentUsername,
-                dateStart: dateStart,
-                dateEnd: dateEnd
-            };
+        function validateTimes() {
+            const startDate = document.getElementById('start-date').value;
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
 
-            // Send data via a POST request using Fetch API
-            fetch('/SendClass', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert('Class added successfully!');
-                console.log('Success:', data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+            // Get the current date in YYYY-MM-DD format
+            const currentDate = new Date().toISOString().split('T')[0];
+
+            // Validate that the start date is in the future
+            if (startDate < currentDate) {
+                alert('The start date must be in the future.');
+                return false;
+            }
+
+            // Validate that the end time is after the start time
+            if (endTime <= startTime) {
+                alert('End time must be after start time.');
+                return false;
+            }
+            return true;
         }
     </script>
 </head>
 <body>
-    <form>
-        <label for="student_username">Student Name:</label>
-        <input type="text" id="student_username" name="student_username" required><br><br>
-
+    <form method="POST" action="{{ url_for('RequestClass', elder_name=elder_name, elder_id=elder_id) }}" onsubmit="return validateTimes()">
+        <h2>Request a Class with {{ elder_name }}</h2>
+        
         <label for="start-date">Start Date:</label>
-        <input type="datetime-local" id="start-date" name="dateStart" required><br><br>
+        <input type="date" id="start-date" name="date_start" onchange="syncEndDate()" required>
 
-        <label for="end-date">End Date:</label>
-        <input type="datetime-local" id="end-date" name="dateEnd" required><br><br>
+        <label for="start-time">Start Time:</label>
+        <input type="time" id="start-time" name="start_time" required>
 
-        <!-- Use JavaScript to handle the click event -->
-        <a href="#" onclick="sendClassData(event)">Submit</a>
+        <label for="end-time">End Time:</label>
+        <input type="time" id="end-time" name="end_time" required>
+
+        <input type="hidden" id="end-date" name="date_end">
+
+        <label for="notes">Additional Notes:</label>
+        <textarea id="notes" name="notes" rows="4"></textarea>
+
+        <button type="submit">Submit</button>
     </form>
 </body>
 </html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>בהמתנה לאישור</title>
+    <style>
+        * {
+            text-decoration: none;
+        }
+        .navbar {
+            background: gray;
+            font-family: calibri;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+        .navdiv {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo a {
+            font-size: 35px;
+            font-weight: 600;
+            color: white;
+        }
+        ul {
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            list-style: none;
+            display: inline-block;
+        }
+        li a {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: 25px;
+        }
+        button {
+            background-color: black;
+            margin-left: 10px;
+            border-radius: 10px;
+            padding: 10px;
+            width: 90px;
+            border: none;
+        }
+        button a {
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            text-decoration: none;
+        }
+        .home-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px;
+        }
+        .home-title {
+            font-size: 40px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .home-text {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+        .status-text {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: darkred;
+        }
+        .time-text {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        .request-again {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: crimson;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .request-again:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navdiv">
+            <div class="logo"><a href="#">מערכת שיעורי עזר</a></div>
+            <ul>
+                <li><a href="#">בית</a></li>
+                <li><a href="#">אודות</a></li>
+            </ul>
+            <button><a href="/logout">התנתקות</a></button>
+        </div>
+    </nav>
+
+    <div class="home-content">
+        <h1 class="home-title">שלום, {{ name }}</h1>
+        <p class="home-text">בקשת ההרשמה שלך ממתינה לאישור. אנא המתן לאישור מנהל.</p>
+
+        <!-- Display the current status -->
+        <p class="status-text">
+            סטטוס: 
+            {% if status %}
+                בהמתנה
+            {% else %}
+                נדחה
+            {% endif %}
+        </p>
+
+        <!-- Display the time since request TODO -->
+        <p class="time-text">זמן מאז הבקשה: {{ time_since_request }}</p>
+
+        <!-- If rejected, show the request again button -->
+        {% if status == False %}
+            <button class="request-again" onclick="location.href='/register'">הגשת בקשה מחדש</button>
+        {% endif %}
+    </div>
+</body>
+</html>
