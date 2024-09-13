@@ -113,7 +113,7 @@ def get_all_requests():
             # Check if there are any requests
             if all_requests:
                 # Convert the data into a list of dictionaries (if needed)
-                requests_list = list(all_requests)
+                requests_list = list(all_requests.values())
             else:
                 requests_list = []
             return requests_list

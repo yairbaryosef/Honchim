@@ -73,7 +73,7 @@
 <body>
     <div class="form-container">
         <h1>Create a New Class</h1>
-        <form id="classForm">
+        <form id="classForm" method="POST" action="/SendClass">
             <label for="student_username">Student Name:</label>
             <input type="text" id="student_username" name="student_username" placeholder="Enter your name" required>
 
@@ -102,20 +102,24 @@
             const dateStart = document.getElementById('start-date').value;
             const dateEnd = document.getElementById('end-date').value;
 
-            const data = {
-                student_username: studentUsername,
-                dateStart: dateStart,
-                dateEnd: dateEnd
-            };
+            const data = new URLSearchParams();
+            data.append('student_username', studentUsername);
+            data.append('dateStart', dateStart);
+            data.append('dateEnd', dateEnd);
 
             fetch('/SendClass', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body: JSON.stringify(data)
+                body: data
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 document.getElementById('formMessage').innerHTML = '<p class="success">Class added successfully!</p>';
                 console.log('Success:', data);

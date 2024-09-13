@@ -261,6 +261,24 @@
                         <td data-label="Profile Picture"><img src='{{ request.profile_url }}' alt="Profile Picture"></td>
                         <td data-label="Grades"><a href="{{ request.grades_url }}" class="view-pdf">View PDF</a></td>
                     </tr>
+                     </tr>
+                <tr>
+                    <td colspan="9" style="text-align: center; padding: 20px;">
+    <div class="action-btn-container">
+        <a class="action-btn accept-btn"
+           href="/handle_request/accept?request={{ request | tojson | urlencode }}"
+           style="background-color: #4CAF50; color: #fff; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer;">
+            Accept
+        </a>
+        <a class="action-btn cancel-btn"
+           href="/handle_request/cancel?request={{ request | tojson | urlencode }}"
+           style="background-color: #e74c3c; color: #fff; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer;">
+            Cancel
+        </a>
+    </div>
+</td>
+
+                </tr>
                     {% endfor %}
                 </tbody>
             </table>

@@ -64,11 +64,14 @@ def login():
                 db.reference('Users').child('חונך').child(username).get() or \
                 db.reference('Users').child('מחכה לאישור').child(username).get()
 
-        if not (user and check_password_hash(user['password'], password)):  # Verify hashed password
-            return render_template('login.html', error="Invalid username or password.")
-        else:
-            session['id'] = username
-            return redirect(url_for('HomePage'))
+     #   if not (user and check_password_hash(user['password'], password)):  # Verify hashed password
+      #      return render_template('login.html', error="Invalid username or password.")
+       # else:
+        with open("DB/user.json", 'w') as f:
+            json.dump(user, f)
+
+        session['id'] = username
+        return redirect(url_for('HomePage'))
     
     return render_template('login.html')
         
@@ -80,12 +83,13 @@ def HomePage():
               db.reference('Users').child('חונך').child(session['id']).get() or \
                 db.reference('Users').child('מחכה לאישור').child(session['id']).get()
     name = user.get('name')
-    if 'חניך' in user:
+
+    if 'חניך' == user['type']:
         return render_template('CadetHomePage.html', name = name)
     # TODO: FINISH חונך
-    elif 'חונך' in user:
+    elif 'חונך' == user['type']:
         return render_template('ElderHomePage.html')
-    elif 'מחכה לאישור' in user:
+    elif 'מחכה לאישור' == user['type']:
         IsPending = PresenterSignIn.checkIfUserRequestExist(session['id'])
         return render_template('PendingHomePage.html', name = name, status = IsPending)
     else:
@@ -193,18 +197,27 @@ def MyClasses():
 
 from datetime import datetime
 
+
+@app.route('/create_class', methods=['GET', 'POST'])
+def move_to_create_class():
+    # Read JSON data from file
+    with open("DB/user.json", 'r') as f:
+        user = json.load(f)  # Correctly loads the JSON data into a Python dictionary
+    user.setdefault('name', 'DefaultName')
+    # Construct the URL for the RequestClass endpoint
+    return redirect(url_for('RequestClass', elder_name=user['name'], elder_id=user['id']))
+
+
 # Send Class route
 @app.route('/RequestClass/<elder_name>/<elder_id>', methods=['GET', 'POST'])
 def RequestClass(elder_name, elder_id):
     if 'id' not in session:
         return redirect(url_for('home'))
-
+    PresenterSignIn.initFirebase()
     # Fetch the elder's details using the elder_id
     elder_ref = db.reference('Users').child('חונך').child(elder_id)
     elder = elder_ref.get()
 
-    if not elder or elder.get('name') != elder_name:
-        return render_template('error.html', message="Elder not found")
 
     if request.method == 'POST':
         # Extract form data
@@ -214,7 +227,7 @@ def RequestClass(elder_name, elder_id):
 
         # Combine the date with the times
         date_start_combined = date_start + ' ' + start_time
-        date_end_combined = date_start + ' ' + end_time  # The end date is the same as start date
+        date_end_combined = date_start + ' ' + end_time
 
         notes = request.form.get('notes')
 
@@ -240,15 +253,76 @@ def RequestClass(elder_name, elder_id):
         }
 
         # Save the request to the elder's record
-        if 'class_requests' not in elder:
-            elder['class_requests'] = []
-        elder['class_requests'].append(new_class)
-        elder_ref.set(elder)
+        cadet=db.reference('Users').child('חניך').child(cadet_id).get()
+        cadet.classes_to_aprove.append(new_class)
+        db.reference('Users').child('חניך').child(cadet_id).set(cadet)
+
 
         return render_template('request_class_success.html', elder=elder)
 
     # For GET requests, render the class request form
     return render_template('CreateClass.html', elder_name=elder_name, elder_id=elder_id)
+
+@app.route('/SendClass', methods=['POST'])
+def SendClass():
+    if request.method == 'POST':
+        try:
+            PresenterSignIn.initFirebase()
+        except Exception as e:
+            print(f"Firebase initialization error: {e}")  # Handle the initialization issue
+
+        # Get data from the form
+        student_username = request.form.get('student_username')
+        date_start_str = request.form.get('dateStart')
+        date_end_str = request.form.get('dateEnd')
+        with open("DB/user.json", 'r') as f:
+            user = json.load(f)
+        teacher = user['id']  # Replace with actual teacher info if available
+
+        # Check if any of the required fields are missing
+        if not student_username or not date_start_str or not date_end_str:
+            return jsonify({"error": "Missing required form fields"}), 400
+
+        # Correct date format for parsing
+        date_format = "%Y-%m-%dT%H:%M"
+
+        try:
+            # Convert the strings to datetime objects
+            date_start = datetime.strptime(date_start_str, date_format)
+            date_end = datetime.strptime(date_end_str, date_format)
+
+            # Reformat dates to match the desired output format
+            formatted_date_start = date_start.strftime("%d/%m/%Y %I:%M %p")
+            formatted_date_end = date_end.strftime("%d/%m/%Y %I:%M %p")
+
+            # Create the new class dictionary with formatted dates
+            new_class = {
+                "teacher": teacher,
+                "dateStart": formatted_date_start,
+                "dateEnd": formatted_date_end
+            }
+
+            # Retrieve the student from Firebase
+            student_ref = db.reference('Users').child('חניך').child(student_username)
+            student_data = student_ref.get()
+
+            # Add new class to the student's classes_to_approve list
+            if student_data:
+                if 'classes_to_aprove' not in student_data:
+                    student_data['classes_to_aprove'] = []
+                student_data['classes_to_aprove'].append(new_class)
+                student_ref.set(student_data)
+
+            return jsonify({"message": "Class added successfully"}), 200
+
+        except ValueError as ve:
+            return jsonify({"error": f"Invalid date format: {ve}"}), 400
+
+        except Exception as e:
+            return jsonify({"error": f"An error occurred: {e}"}), 500
+
+    return jsonify({"error": "Invalid request method"}), 405
+
 
 
 
@@ -345,6 +419,3 @@ def not_found_error(error):
 def internal_error(error):
     return render_template('error.html', message="An unexpected error occurred"), 500
 
-# Run the Flask app
-if __name__ == '__main__':
-    app.run(debug=True)
