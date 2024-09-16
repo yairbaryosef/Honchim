@@ -264,25 +264,35 @@
         </form>
 
         <!-- List of Elders -->
-        <div class="elder-list">
-            {% for elder in elders %}
-                <form method="GET" action="{{ url_for('RequestClass', elder_name=elder.name, elder_id=elder.id) }}" class="elder-card">
-                    <h2>{{ elder.name }}</h2>
-                    <div class="school-info">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>{{ elder.uni }}</span>
-                        <span>{{ elder.degree }}</span>
-                    </div>                                    
-                    <p class="description">קצת עליי : "{{ elder.description }}"</p>
-                    <div class="expertise">מציע עזרה ב: {{ elder.help }} </div>
-                    <div class="price">כמות שיעורים שעשה?</div>
-                    <div class="contact">
-                        <button type="submit">צור קשר עם {{ elder.first_name }}</button>
-                    </div>
-                    <img src="{{ elder.profile_url }}" alt="Profile Picture">
-                </form>
-            {% endfor %}
+        <div class="elder-list">{% for elder in elders %}
+    <div class="elder-card">
+        <h2>{{ elder.name }}</h2>
+        <div class="school-info">
+            <i class="fas fa-graduation-cap"></i>
+            <span>{{ elder.uni }}</span>
+            <span>{{ elder.degree }}</span>
+        </div>
+        <p class="description">קצת עליי : "{{ elder.description }}"</p>
+        <div class="expertise">מציע עזרה ב: {{ elder.help }}</div>
+        <div class="price">כמות שיעורים שעשה?</div>
+        <div class="contact">
+          <button type="button" onclick="contactElder({{ elder.id }})">צור קשר עם {{ elder.name }}</button>
+   </div>
+        <img src="{{ elder.profile_url }}" alt="Profile Picture">
+    </div>
+{% endfor %}
+
+<script>function contactElder(elderId) {
+    // Redirect to the /contact endpoint with the elderId as a query parameter
+    window.location.href = `/contact?id=${elderId}`;
+}
+
+
+</script>
+
+
         </div>                  
     </div>
 </body>
+
 </html>

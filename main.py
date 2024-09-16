@@ -208,6 +208,16 @@ def move_to_create_class():
     return redirect(url_for('RequestClass', elder_name=user['name'], elder_id=user['id']))
 
 
+@app.route('/contact', methods=['GET'])
+def contact_elder():
+    elder_id = request.args.get('id')  # Get the 'id' parameter from the query string
+    print(f"Received elder ID: {elder_id}")
+    with open("DB/user.json", 'r') as f:
+        data = json.load(f)
+    # Log the ID for debugging
+    db.reference('Users').child('חונך').child(elder_id).child('students').push(data['id'])
+    return f"הוסםת את עצמך בהצלחה למשתמש: {elder_id}"
+
 # Send Class route
 @app.route('/RequestClass/<elder_name>/<elder_id>', methods=['GET', 'POST'])
 def RequestClass(elder_name, elder_id):
@@ -277,7 +287,12 @@ def SendClass():
         date_end_str = request.form.get('dateEnd')
         with open("DB/user.json", 'r') as f:
             user = json.load(f)
-        teacher = user['id']  # Replace with actual teacher info if available
+        teacher = user['id']
+        print(user['students'].values())
+        if student_username not in list(user['students'].values()):
+            return "User does not belong to you"
+
+        # Replace with actual teacher info if available
 
         # Check if any of the required fields are missing
         if not student_username or not date_start_str or not date_end_str:
@@ -287,6 +302,7 @@ def SendClass():
         date_format = "%Y-%m-%dT%H:%M"
 
         try:
+
             # Convert the strings to datetime objects
             date_start = datetime.strptime(date_start_str, date_format)
             date_end = datetime.strptime(date_end_str, date_format)
