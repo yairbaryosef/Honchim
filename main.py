@@ -61,10 +61,13 @@ def login():
             return render_template('ListRequests.html', requests=requests)
 
         user = db.reference('Users').child('חניך').child(username).get() or \
-                db.reference('Users').child('חונך').child(username).get() or \
-                db.reference('Users').child('מחכה לאישור').child(username).get()
+               db.reference('Users').child('חונך').child(username).get() or \
+               db.reference('Users').child('מחכה לאישור').child(username).get()
 
-     #   if not (user and check_password_hash(user['password'], password)):  # Verify hashed password
+        if user is None:
+            return render_template('SignAsCadetOrElder.html')
+
+        #   if not (user and check_password_hash(user['password'], password)):  # Verify hashed password
       #      return render_template('login.html', error="Invalid username or password.")
        # else:
         with open("DB/user.json", 'w') as f:
@@ -289,7 +292,7 @@ def SendClass():
             user = json.load(f)
         teacher = user['id']
         print(user['students'].values())
-        if student_username not in list(user['students'].values()):
+        if student_username not in user['students'].values():
             return "User does not belong to you"
 
         # Replace with actual teacher info if available
@@ -386,8 +389,9 @@ def search_elders():
 
     # Convert the elders data into a list
     elders_list = []
+    elders = [elder for elder in elders if elder is not None]
     if elders:
-        for key, elder in elders.items():
+        for elder in elders:
             if elder.get('type') == 'חונך' or True:
                 elder_name = elder.get('name')
                 elder['first_name'] = elder_name.split(' ')[0] if elder_name else ''  
