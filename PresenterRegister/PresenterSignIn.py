@@ -46,9 +46,13 @@ def saveRequest(profile_local_path, grades_local_path, id, name, password, type,
         profile_blob.upload_from_filename(profile_local_path)
         grades_blob.upload_from_filename(grades_local_path)
 
+        # Make the files public
+        profile_blob.make_public()
+        grades_blob.make_public()
+
         # Get the public URLs of the uploaded files
-        profile_url = profile_blob.generate_signed_url(timedelta(days=7), method='GET')
-        grades_url = grades_blob.generate_signed_url(timedelta(days=7), method='GET')
+        profile_url = profile_blob.public_url
+        grades_url = grades_blob.public_url
     except FileNotFoundError as e:
          # Handle the case where the files were not found
         print(f"Error during file upload: {e}")

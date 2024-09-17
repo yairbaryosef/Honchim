@@ -1,4 +1,4 @@
-<form action="{{ url_for('SignIn') }}" method="POST" enctype="multipart/form-data">
+<form action="{{ url_for('register2') }}" method="POST" enctype="multipart/form-data">
   <meta charset="UTF-8">
 
   <label for="type">Type:</label>
@@ -32,7 +32,7 @@
   <input type="file" id="profile-picture" name="profile-picture" accept="image/*">
 
   <label for="grades">Grades:</label>
-  <input type="file" id="grades" name="grades" accept=".pdf">
+  <input type="file" id="grades" name="grades" accept="image/*">
 
   <label for="description">Description:</label>
   <textarea id="description" name="description" placeholder="Tell us about yourself"></textarea>
