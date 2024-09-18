@@ -1,34 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Request Successful</title>
+    <meta name="description" content="מערכת שיעורי עזר - יצירת שיעור מוצלחת.">
+    <meta name="keywords" content="שיעורים, חונכים, תלמידים, יצירת שיעור מוצלחת">
+    <meta name="author" content="מערכת שיעורי עזר">
+    <title>בקשת שיעור מוצלחת</title>
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&display=swap">
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+        * {
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            box-sizing: border-box;
+            text-decoration: none;
         }
 
-        .container {
-            background-color: #fff;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 500px;
+        body {
+            font-family: 'Alef', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #C62828;
+            padding: 15px 30px;
+            position: fixed;
+            top: 0;
             width: 100%;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navdiv {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo a {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .logout-btn {
+            background-color: #333;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #444;
+            transform: translateY(-3px);
+        }
+
+        /* Container */
+        .form-container {
+            max-width: 500px;
+            margin: 120px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
         h1 {
             color: #4CAF50;
-            font-size: 24px;
+            font-size: 28px;
             margin-bottom: 20px;
         }
 
@@ -39,26 +94,62 @@
 
         a {
             display: inline-block;
-            background-color: #4CAF50;
+            background-color: #C62828;
             color: white;
             padding: 10px 20px;
-            text-decoration: none;
             border-radius: 5px;
             font-size: 16px;
             margin-top: 20px;
+            text-decoration: none;
         }
 
         a:hover {
-            background-color: #45a049;
+            background-color: #b71c1c;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            width: 100%;
+            bottom: 0;
+        }
+
+        footer a {
+            color: #C62828;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Class Request Submitted!</h1>
-        <p>Your request for a class with {{ elder.name }} has been successfully submitted.</p>
-        <p>You will be notified once the elder responds to your request.</p>
-        <a href="{{ url_for('HomePage') }}">Return to Home</a>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navdiv">
+            <div class="logo"><a href="#">מערכת שיעורי עזר</a></div>
+            <a href="/logout" class="logout-btn">התנתקות</a>
+        </div>
+    </nav>
+
+    <!-- Container -->
+    <div class="form-container">
+        <h1>בקשת שיעור הוגשה בהצלחה!</h1>
+        <p>בקשת השיעור שלך עם {{ elder.name }} נשלחה בהצלחה.</p>
+        <p>תקבל הודעה כאשר החונך יגיב לבקשתך.</p>
+        <a href="{{ url_for('HomePage') }}">חזור לדף הבית</a>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        © 2024 מערכת שיעורי עזר. כל הזכויות שמורות.
+    </footer>
+
 </body>
 </html>

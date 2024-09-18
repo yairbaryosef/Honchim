@@ -1,211 +1,288 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he">
 <head>
     <meta charset="UTF-8">
-    <title>Registration - Step 2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="מערכת שיעורי עזר - הרשמת משתמש.">
+    <meta name="keywords" content="שיעורים, חונכים, תלמידים, הרשמה">
+    <meta name="author" content="מערכת שיעורי עזר">
+    <title>הרשמה - שלב 2</title>
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&display=swap">
+
     <style>
-        body {
+        /* Reset default browser styles */
+        * {
             margin: 0;
             padding: 0;
-            background-image: url('../Images/login_bac.jpg');
-            background-size: cover;
-            background-position: center;
-            font-family: 'Open Sans', sans-serif;
+            box-sizing: border-box;
+            text-decoration: none;
         }
 
-        .testbox {
-            margin: 20px auto;
-            width: 343px;
+        body {
+            font-family: 'Alef', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #C62828;
+            padding: 15px 30px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navdiv {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo a {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            background-color: #333;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #444;
+            transform: translateY(-3px);
+        }
+
+        /* Form Container */
+        .form-container {
+            max-width: 600px;
+            margin: 120px auto;
+            background-color: white;
+            padding: 30px;
             border-radius: 8px;
-            background-color: #ebebeb;
-            box-shadow: 1px 2px 5px rgba(0,0,0,.31);
-            border: solid 1px #cbc9c9;
-            padding: 20px;
-        }
-
-        form {
-            margin: 0 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
-            font-size: 32px;
-            font-weight: 300;
-            color: #4c4c4c;
             text-align: center;
-            padding-top: 10px;
+            color: #C62828;
+            font-size: 28px;
             margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            position: relative;
         }
 
         label {
             display: block;
-            font-size: 14px;
-            margin-bottom: 5px;
-            color: #4c4c4c;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
         }
 
-        input[type=text], input[type=file], input[type=number], input[type=tel], select, textarea {
-            width: calc(100% - 40px);
-            height: 39px;
-            border-radius: 4px;
-            background-color: #fff;
-            box-shadow: 1px 2px 5px rgba(0,0,0,.09);
-            border: solid 1px #cbc9c9;
-            padding-left: 10px;
-            margin-left: 10px;
+        input[type="text"], input[type="tel"], input[type="number"], input[type="file"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+            font-size: 16px;
+        }
+
+        input[type="text"]:focus, input[type="tel"]:focus, input[type="number"]:focus, textarea:focus {
+            border-color: #28a745;
+            outline: none;
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.2);
         }
 
         textarea {
             height: 80px;
         }
 
-        .icon-container {
-            width: 30px;
-            height: 30px;
-            background-color: #3a57af;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
             color: white;
-            box-shadow: 1px 2px 5px rgba(0,0,0,.09);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .loading {
+            cursor: not-allowed;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .custom-input {
+            display: none;
         }
 
         .description {
             font-size: 12px;
             color: #4c4c4c;
-            margin-top: 5px;
+            margin-top: -10px;
             margin-bottom: 15px;
         }
 
-        .button {
-            font-size: 14px;
-            font-weight: 600;
+        /* Footer */
+        footer {
+            background-color: #333;
             color: white;
-            padding: 6px 25px;
-            margin-top: 20px;
-            display: block;
-            width: 100%;
-            height: 35px;
-            border-radius: 5px;
-            background-color: #3a57af;
-            box-shadow: 0 3px rgba(58,87,175,.75);
-            transition: all 0.1s linear 0s;
-            border: none;
-            cursor: pointer;
             text-align: center;
+            padding: 20px;
+            position: relative;
+            width: 100%;
+            bottom: 0;
         }
 
-        .button:hover {
-            background-color: #2e458b;
-            box-shadow: none;
+        footer a {
+            color: #C62828;
+            font-weight: bold;
         }
 
-        .custom-input {
-            display: none;
-            margin-top: 10px;
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navdiv {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .form-container {
+                margin-top: 150px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navdiv {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            input[type="text"], input[type="tel"], input[type="number"], textarea {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600' rel='stylesheet' type='text/css'>
-    <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel='stylesheet'>
 
-    <div class="testbox">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navdiv">
+            <div class="logo"><a href="#">מערכת שיעורי עזר</a></div>
+            <a href="/logout" class="logout-btn">התנתקות</a>
+        </div>
+    </nav>
+
+    <!-- Form Container -->
+    <div class="form-container">
         <h1>הרשמה - שלב 2</h1>
         <form action="/register_step2" method="POST" enctype="multipart/form-data">
-            <hr>
+            <label for="type">סוג:</label>
+            <select name="type" id="type" required>
+                <option value="">בחר סוג</option>
+                <option value="חניך">חניך</option>
+                <option value="חונך">חונך</option>
+            </select>
 
-            <div class="form-group">
-                <div class="icon-container">
-                    <i class="icon-briefcase"></i>
-                </div>
-                <select name="type" id="type" required>
-                    <option value="">בחר סוג</option>
-                    <option value="חניך">חניך</option>
-                    <option value="חונך">חונך</option>
-                </select>
-            </div>
+            <label for="year">שנה:</label>
+            <input type="number" name="year" id="year" placeholder="שנה"/>
 
-            <div class="form-group">
-                <div class="icon-container">
-                    <i class="icon-calendar"></i>
-                </div>
-                <input type="number" name="year" id="year" placeholder="שנה"/>
-            </div>
+            <label for="degree">תואר:</label>
+            <input type="text" name="degree" id="degree" placeholder="תואר"/>
 
-            <div class="form-group">
-                <div class="icon-container">
-                    <i class="icon-graduation-cap"></i>
-                </div>
-                <input type="text" name="degree" id="degree" placeholder="תואר"/>
-            </div>
+            <label for="university">מוסד לימוד:</label>
+            <select name="university" id="university" required>
+                <option value="">בחר מוסד לימוד</option>
+                <option value="Ben Gurion University">Ben Gurion University</option>
+                <option value="Tel Aviv University">Tel Aviv University</option>
+                <option value="custom">אחר</option>
+            </select>
+            <input type="text" name="custom-university" id="custom-university" class="custom-input" placeholder="הכנס מוסד לימוד חדש"/>
 
-            <div class="form-group">
-                <div class="icon-container">
-                    <i class="icon-building"></i>
-                </div>
-                <select name="university" id="university" required>
-                    <option value="">בחר מוסד לימוד</option>
-                    <option value="Ben Gurion University">Ben Gurion University</option>
-                    <option value="Tel Aviv University">Tel Aviv University</option>
-                    <option value="custom">אחר</option>
-                </select>
-                <input type="text" name="custom-university" id="custom-university" class="custom-input" placeholder="הכנס מוסד לימוד חדש"/>
-            </div>
+            <label for="phone">טלפון:</label>
+            <input type="tel" name="phone" id="phone" placeholder="טלפון"/>
 
-            <div class="form-group">
-                <div class="icon-container">
-                    <i class="icon-phone"></i>
-                </div>
-                <input type="tel" name="phone" id="phone" placeholder="טלפון"/>
-            </div>
+            <label for="help">מקצוע לעזרה:</label>
+            <select name="help" id="help" required>
+                <option value="">בחר מקצוע לעזרה</option>
+                <option value="Math">Math</option>
+                <option value="Programming">Programming</option>
+                <option value="custom">אחר</option>
+            </select>
+            <input type="text" name="custom-help" id="custom-help" class="custom-input" placeholder="הכנס מקצוע חדש"/>
 
-            <div class="form-group">
-                <div class="icon-container">
-                    <i class="icon-lightbulb"></i>
-                </div>
-                <select name="help" id="help" required>
-                    <option value="">בחר מקצוע לעזרה</option>
-                    <option value="Math">Math</option>
-                    <option value="Programming">Programming</option>
-                    <option value="custom">אחר</option>
-                </select>
-                <input type="text" name="custom-help" id="custom-help" class="custom-input" placeholder="הכנס מקצוע חדש"/>
-            </div>
-
-            <div class="form-group">
-                <div class="icon-container">
-                    <i class="icon-camera"></i>
-                </div>
-                <input type="file" name="profile-picture" id="profile-picture" accept="image/*"/>
-            </div>
+            <label for="profile-picture">תמונת פרופיל:</label>
+            <input type="file" name="profile-picture" id="profile-picture" accept="image/*"/>
             <p class="description">העלה תמונת פרופיל (jpg, png, etc.)</p>
 
-            <div class="form-group">
-                <div class="icon-container">
-                    <i class="icon-file"></i>
-                </div>
-                <input type="file" name="grades" id="grades" accept="image/*,.pdf,.doc,.docx"/>
-            </div>
+            <label for="grades">מסמך ציונים:</label>
+            <input type="file" name="grades" id="grades" accept="image/*,.pdf,.doc,.docx"/>
             <p class="description">העלה מסמך ציונים (pdf, doc, docx, etc.)</p>
 
-            <div class="form-group">
-                <div class="icon-container">
-                    <i class="icon-comment"></i>
-                </div>
-                <textarea name="description" id="description" placeholder="תיאור"></textarea>
-            </div>
+            <label for="description">תיאור:</label>
+            <textarea name="description" id="description" placeholder="תיאור"></textarea>
 
             <button type="submit" class="button">הרשמה</button>
         </form>
+        <div id="formMessage" class="message"></div>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        © 2024 מערכת שיעורי עזר. כל הזכויות שמורות.
+    </footer>
 
     <script>
         document.getElementById('university').addEventListener('change', function() {

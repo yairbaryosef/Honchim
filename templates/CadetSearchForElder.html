@@ -3,94 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="description" content="מערכת שיעורי עזר - נועד לעזור לתלמידים ולחניכים למצוא תמיכה, גישה לשיעורים, ולארגן את זמנם בצורה טובה יותר">
+    <meta name="keywords" content="שיעורים, חונכים, תלמידים, חניכים, למידה">
+    <meta name="author" content="מערכת שיעורי עזר">
     <title>בחירת חונך</title>
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&display=swap">
+
     <style>
-        body {
+        /* Reset default browser styles */
+        * {
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            font-family: 'Open Sans', sans-serif;
-            direction: rtl;
+            box-sizing: border-box;
+            text-decoration: none;
         }
 
+        body {
+            font-family: 'Alef', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Navbar */
         .navbar {
-            background: crimson;
-            font-family: calibri;
-            padding-right: 15px;
-            padding-left: 15px;
+            background-color: #C62828;
+            padding: 15px 30px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .navdiv {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .logo a {
-            font-size: 35px;
-            font-weight: 600;
+            font-size: 30px;
+            font-weight: bold;
             color: white;
         }
 
         ul {
-            padding: 0;
-            margin: 0;
+            list-style: none;
         }
 
         li {
-            list-style: none;
             display: inline-block;
+            margin-right: 30px;
         }
 
         li a {
             color: white;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            margin-right: 25px;
+            transition: color 0.3s ease, transform 0.3s ease;
         }
 
-        button {
-            background-color: black; /* Set background color to black */
-            margin-left: 10px;
-            border-radius: 10px;
-            padding: 10px;
-            width: 90px;
-            border: none;
-            cursor: pointer;
-        }
-
-        button a {
-            color: white; /* Ensure the text color contrasts with the black background */
+        /* Logout Button */
+        .logout-btn {
+            background-color: #333;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 20px;
             font-weight: bold;
             font-size: 15px;
-            text-decoration: none;
-        }
-
-        .search-bar button {
-            padding: 5px; /* Adjust padding to fit the icon */
-            font-size: 16px; /* Adjust font size of the icon */
             border: none;
-            border-radius: 5px;
-            background-color: #ccc; /* Set background color for visibility */
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: inline-block;
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
 
-        .search-bar button i {
-            font-size: 20px; /* Make sure the icon size is appropriate */
+        .logout-btn:hover {
+            background-color: #444;
+            transform: translateY(-3px);
         }
 
+        /* Hover Effects */
+        li a:hover {
+            color: #f0f0f0;
+            transform: translateY(-3px);
+        }
+
+        /* Focus Styles for Accessibility */
+        a:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #C62828;
+        }
+
+        /* Home Content */
         .home-content {
-            padding: 20px;
+            padding: 100px 20px;
+            margin-top: 70px;
+            text-align: center;
         }
 
-        .search-bar {
+        .home-title {
+            font-size: 42px;
+            font-weight: bold;
+            color: #C62828;
             margin-bottom: 20px;
+        }
+
+        .home-text {
+            font-size: 18px;
+            color: #555;
+            max-width: 700px;
+            margin: 0 auto;
+            margin-bottom: 40px;
+        }
+
+        /* Search bar and filters */
+        .search-bar {
             display: flex;
             justify-content: center;
+            margin-bottom: 20px;
         }
 
         .search-bar input, .search-bar select, .search-bar button {
@@ -105,11 +141,27 @@
             width: 300px;
         }
 
+        .search-bar button {
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+            border: none;
+            padding: 10px;  /* Ensure height matches inputs */
+            height: 100%;  /* Match the height of the input fields */
+            transition: background-color 0.3s ease;
+        }
+
+        .search-bar button:hover {
+            background-color: #444;
+        }
+
+        /* Elder list styling (tutors list) */
         .elder-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 20px;
             justify-items: center;
+            margin: 0 20px;
         }
 
         .elder-card {
@@ -119,7 +171,6 @@
             width: 100%;
             max-width: 700px;
             padding: 15px;
-            box-sizing: border-box;
             display: grid;
             grid-template-areas:
                 "image . name price"
@@ -127,9 +178,16 @@
                 "image . school-info ."
                 "image . description ."
                 ". . . contact";
-            grid-template-columns: 2fr 1px 200px 100px;
+            grid-template-columns: 100px 20px 1fr 100px;
             gap: 10px;
             align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add transition for hover */
+        }
+
+        /* Elder Card Hover Animation */
+        .elder-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
         }
 
         .elder-card img {
@@ -141,12 +199,11 @@
             border: 2px solid #ccc;
         }
 
-
         .elder-card h2 {
             grid-area: name;
             font-size: 18px;
-            color: #333;
             font-weight: bold;
+            color: #333;
             margin: 0;
             text-align: right;
         }
@@ -161,17 +218,9 @@
         }
 
         .elder-card .school-info .fa-graduation-cap {
-            margin-left: 5px; /* Space between the icon and the text */
-            font-size: 12px;  /* Make sure the icon size matches the text size */
-            color: #666; /* Optional: Match icon color with text color */
-        }
-
-
-        .elder-card .school-info span {
-            display: block;
-            color: #000;
             margin-left: 5px;
-
+            font-size: 12px;
+            color: #666;
         }
 
         .elder-card .description {
@@ -204,23 +253,92 @@
             text-align: left;
         }
 
+        /* Contact Button */
         .elder-card .contact button {
             background-color: #1cdc53;
             color: white;
-            padding: 3px 20px;
+            padding: 10px 20px;
             border: none;
             border-radius: 5px;
-            font-size: 13px;
+            font-size: 14px;
             cursor: pointer;
+            width: 100%;  /* Make the button full width */
+            font-weight: bold;
+            transition: background-color 0.3s ease;
         }
 
         .elder-card .contact button:hover {
-            background-color: #d317d3;
+            background-color: #28a745;
         }
-        
+
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            width: 100%;
+            bottom: 0;
+        }
+
+        footer a {
+            color: #C62828;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .elder-card {
+                grid-template-columns: 100px 10px 1fr;
+            }
+
+            .navdiv {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .logo a {
+                font-size: 28px;
+            }
+
+            ul {
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .elder-card {
+                grid-template-columns: 80px 10px 1fr;
+                padding: 10px;
+            }
+
+            .navdiv {
+                padding: 15px;
+            }
+
+            li {
+                margin-right: 10px;
+            }
+
+            .search-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-bar input, .search-bar select, .search-bar button {
+                margin-bottom: 10px;
+            }
+        }
     </style>
 </head>
 <body>
+
+    <!-- Navbar -->
     <nav class="navbar">
         <div class="navdiv">
             <div class="logo"><a href="#">מערכת שיעורי עזר</a></div>
@@ -230,12 +348,13 @@
                 <li><a href="#">בחירת חונך</a></li>
                 <li><a href="#">השיעורים שלי</a></li>
             </ul>
-            <button><a href="/logout">התנתק</a></button>
+            <a href="/logout" class="logout-btn">התנתקות</a>
         </div>
     </nav>
 
     <div class="home-content">
         <h1 class="home-title">ברוך הבא, {{ name }}</h1>
+        <p class="home-text">כאן תוכל לגשת לשיעורים שלך, לחפש חונכים, ולצפות בשיעורים המתוזמנים שלך. האתר נועד להקל עליך למצוא תמיכה ולארגן את זמנך בצורה הטובה ביותר.</p>
 
         <!-- Search and Filter Bar -->
         <form method="POST" class="search-bar">
@@ -250,39 +369,48 @@
                 <option value="">בחר תואר</option>
                 <option value="Computer Science">מדעי המחשב</option>
                 <option value="Engineering">הנדסה</option>
-                <!-- Add more degrees here -->
             </select>
             <select name="university" id="uni-filter">
                 <option value="">בחר מוסד לימוד</option>
                 <option value="Ben Gurion University">אוניברסיטת בן גוריון</option>
                 <option value="Tel Aviv University">אוניברסיטת תל אביב</option>
-                <!-- Add more universities here -->
             </select>
             <button type="submit">
-                <i class="fa-brands fa-searchengin"></i>
+                <i class="fas fa-search"></i>
             </button>
         </form>
 
-        <!-- List of Elders -->
+        <!-- List of Elders (Tutors) -->
         <div class="elder-list">
             {% for elder in elders %}
-                <form method="GET" action="{{ url_for('RequestClass', elder_name=elder.name, elder_id=elder.id) }}" class="elder-card">
-                    <h2>{{ elder.name }}</h2>
-                    <div class="school-info">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>{{ elder.uni }}</span>
-                        <span>{{ elder.degree }}</span>
-                    </div>                                    
-                    <p class="description">קצת עליי : "{{ elder.description }}"</p>
-                    <div class="expertise">מציע עזרה ב: {{ elder.help }} </div>
-                    <div class="price">כמות שיעורים שעשה?</div>
-                    <div class="contact">
-                        <button type="submit">צור קשר עם {{ elder.first_name }}</button>
-                    </div>
-                    <img src="{{ elder.profile_url }}" alt="Profile Picture">
-                </form>
+            <div class="elder-card">
+                <img src="{{ elder.profile_url }}" alt="Profile Picture">
+                <h2>{{ elder.name }}</h2>
+                <div class="school-info">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>{{ elder.uni }}</span>
+                    <span>{{ elder.degree }}</span>
+                </div>
+                <p class="description">קצת עליי : "{{ elder.description }}"</p>
+                <div class="expertise">מציע עזרה ב: {{ elder.help }}</div>
+                <div class="price">כמות שיעורים שעשה?</div>
+                <div class="contact">
+                    <button type="button" onclick="contactElder({{ elder.id }})">צור קשר עם {{ elder.name }}</button>
+                </div>
+            </div>
             {% endfor %}
-        </div>                  
+        </div>
     </div>
+
+    <footer>
+        © 2024 מערכת שיעורי עזר. כל הזכויות שמורות.
+    </footer>
+
+    <script>
+        function contactElder(elderId) {
+            // Redirect to the /contact endpoint with the elderId as a query parameter
+            window.location.href = `/contact?id=${elderId}`;
+        }
+    </script>
 </body>
 </html>
