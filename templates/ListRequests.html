@@ -1,251 +1,309 @@
-<main class="table" id="requests_table">
-    <section class="table__header">
-        <h1>Requests List</h1>
-        <div class="input-group">
-            <input type="search" placeholder="Search Data...">
-            <img src="images/search.png" alt="">
-        </div>
-    </section>
-    <section class="table__body">
-        <table>
-            <thead>
-                <tr>
-                    <th>Type</th>
-                    <th>Year</th>
-                    <th>Degree</th>
-                    <th>University</th>
-                    <th>Phone</th>
-                    <th>Help</th>
-                    <th>Description</th>
-                    <th>Profile Picture</th>
-                    <th>Grades</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for request in requests %}
-                <tr>
-                    <td>{{ request.type }}</td>
-                    <td>{{ request.year }}</td>
-                    <td>{{ request.degree }}</td>
-                    <td>{{ request.uni }}</td>
-                    <td>{{ request.phone }}</td>
-                    <td>{{ request.help }}</td>
-                    <td>{{ request.description }}</td>
-                    <td><img src='{{ request.profile_url }}' alt=""></td>
-                    <td><img src="{{ request.grades_url }}" alt="" onclick="showFullScreen('{{ request.grades_url }}')"></td>
-                </tr>
-                <tr>
-                    <td colspan="9" style="text-align: center; padding: 20px;">
-    <div class="action-btn-container">
-        <a class="action-btn accept-btn"
-           href="/handle_request/accept?request={{ request | tojson | urlencode }}"
-           style="background-color: #4CAF50; color: #fff; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer;">
-            Accept
-        </a>
-        <a class="action-btn cancel-btn"
-           href="/handle_request/cancel?request={{ request | tojson | urlencode }}"
-           style="background-color: #e74c3c; color: #fff; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer;">
-            Cancel
-        </a>
-    </div>
-</td>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requests List</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Assistant', sans-serif;
+        }
 
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </section>
-</main>
+        body {
+            overflow-x: hidden;
+            background-color: #f4f7fc;
+        }
 
-<script>
-    // Function to show the image in full screen
-    function showFullScreen(imageUrl) {
-        window.open(imageUrl, '_blank');
-    }
+        main.table {
+            width: 100vw;
+            height: 100vh;
+            background-color: #ffffff;
+            box-shadow: 0 .4rem .8rem #0005;
+            overflow: hidden;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
 
-    // Function to handle actions (Accept/Cancel) and send the full request object to the server
-    function handleAction(request, action) {
-        fetch(`/handle_request/${action}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(request) // Send the full request object as JSON
-        }).then(response => {
-            if (response.ok) {
-                alert('Action successful');
-                location.reload(); // Reloads the page to reflect changes
-            } else {
-                alert('Action failed');
+        .table__header {
+            width: 100%;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f9fafc;
+            border-bottom: 2px solid #e3e6f0;
+        }
+
+        .table__header h1 {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .table__header .input-group {
+            width: 30%;
+            height: 2.5rem;
+            background-color: #ffffff;
+            border-radius: 2rem;
+            box-shadow: 0 .1rem .4rem #0002;
+            display: flex;
+            align-items: center;
+            padding: 0 .8rem;
+            transition: width 0.4s ease, box-shadow 0.2s ease;
+        }
+
+        .table__header .input-group:hover {
+            width: 35%;
+            box-shadow: 0 .2rem .5rem #0004;
+        }
+
+        .table__header .input-group img {
+            width: 1.2rem;
+            height: 1.2rem;
+            margin-right: 0.5rem;
+        }
+
+        .table__header .input-group input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background-color: transparent;
+            padding: 0 .5rem;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .table__header .input-group input:focus {
+            background-color: #f1f2f6;
+            box-shadow: 0 0 5px #007BFF;
+        }
+
+        .filter-group {
+            margin-left: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .filter-group label {
+            margin-right: 0.5rem;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .filter-group select {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            background-color: #fff;
+            box-shadow: 0 .1rem .4rem #0002;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .filter-group select:hover {
+            box-shadow: 0 .2rem .5rem #0004;
+        }
+
+        .table__body {
+            width: 100%;
+            max-height: calc(100% - 4rem);
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .table__body::-webkit-scrollbar {
+            width: 0.5rem;
+        }
+
+        .table__body::-webkit-scrollbar-thumb {
+            background-color: #cccccc;
+            border-radius: 0.5rem;
+        }
+
+        .table__body table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1rem;
+            text-align: left;
+        }
+
+        .table__body thead th {
+            background-color: #f0f1f6;
+            color: #333;
+            font-weight: 600;
+            padding: 1rem;
+            border-bottom: 2px solid #e3e6f0;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            text-transform: capitalize;
+            cursor: pointer;
+        }
+
+        .table__body tbody tr {
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .table__body tbody tr:hover {
+            background-color: #f9fafc;
+            transform: scale(1.01);
+        }
+
+        .table__body tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        .table__body td img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            vertical-align: middle;
+        }
+
+        .view-pdf {
+            color: #007BFF;
+            text-decoration: none;
+            transition: color 0.3s ease, transform 0.2s;
+        }
+
+        .view-pdf:hover {
+            color: #FF3333;
+            transform: scale(1.1);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .table__header .input-group {
+                width: 50%;
             }
-        }).catch(error => {
-            console.error('Error:', error);
+
+            .table__body table,
+            .table__body table thead,
+            .table__body table tbody,
+            .table__body table th,
+            .table__body table td,
+            .table__body table tr {
+                display: block;
+            }
+
+            .table__body table thead {
+                display: none;
+            }
+
+            .table__body table tr {
+                margin-bottom: 1rem;
+            }
+
+            .table__body table td {
+                text-align: right;
+                padding: 0.5rem 1rem;
+                position: relative;
+                border-bottom: none;
+            }
+
+            .table__body table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 1rem;
+                font-weight: bold;
+                text-transform: capitalize;
+                color: #333;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="table" id="requests_table">
+        <section class="table__header">
+            <h1>Requests List</h1>
+            <div class="input-group">
+                <input type="search" placeholder="Search Data...">
+                <img src="images/search.png" alt="Search Icon">
+            </div>
+            <div class="filter-group">
+                <label for="typeFilter">Filter by Type:</label>
+                <select id="typeFilter">
+                    <option value="">All</option>
+                    {% for request in requests %}
+                    <option value="{{ request.type }}">{{ request.type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </section>
+        <section class="table__body">
+            <table>
+                <thead>
+                    <tr>
+                        <th data-sort="type">Type</th>
+                        <th data-sort="year">Year</th>
+                        <th data-sort="degree">Degree</th>
+                        <th data-sort="uni">University</th>
+                        <th data-sort="phone">Phone</th>
+                        <th data-sort="help">Help</th>
+                        <th data-sort="description">Description</th>
+                        <th>Profile Picture</th>
+                        <th>Grades</th>
+                    </tr>
+                </thead>
+                <tbody id="requestBody">
+                    {% for request in requests %}
+                    <tr>
+                        <td data-label="Type">{{ request.type }}</td>
+                        <td data-label="Year">{{ request.year }}</td>
+                        <td data-label="Degree">{{ request.degree }}</td>
+                        <td data-label="University">{{ request.uni }}</td>
+                        <td data-label="Phone">{{ request.phone }}</td>
+                        <td data-label="Help">{{ request.help }}</td>
+                        <td data-label="Description">{{ request.description }}</td>
+                        <td data-label="Profile Picture"><img src='{{ request.profile_url }}' alt="Profile Picture"></td>
+                        <td data-label="Grades"><a href="{{ request.grades_url }}" class="view-pdf">View PDF</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const typeFilter = document.getElementById('typeFilter');
+            const tableRows = document.querySelectorAll('#requestBody tr');
+
+            typeFilter.addEventListener('change', function() {
+                const selectedType = this.value.toLowerCase();
+
+                tableRows.forEach(row => {
+                    const type = row.querySelector('td[data-label="Type"]').textContent.toLowerCase();
+                    if (selectedType === "" || type === selectedType) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            });
+
+            // Sorting functionality
+            const headers = document.querySelectorAll('th[data-sort]');
+            headers.forEach(header => {
+                header.addEventListener('click', function() {
+                    const sortKey = this.getAttribute('data-sort');
+                    const sortedRows = Array.from(tableRows).sort((a, b) => {
+                        const aText = a.querySelector(`td[data-label="${sortKey.charAt(0).toUpperCase() + sortKey.slice(1)}"]`).textContent.trim();
+                        const bText = b.querySelector(`td[data-label="${sortKey.charAt(0).toUpperCase() + sortKey.slice(1)}"]`).textContent.trim();
+
+                        return aText.localeCompare(bText, undefined, { numeric: true });
+                    });
+
+                    // Re-insert sorted rows into the table
+                    const tbody = document.getElementById('requestBody');
+                    tbody.innerHTML = '';
+                    sortedRows.forEach(row => tbody.appendChild(row));
+                });
+            });
         });
-    }
-</script>
-
-<script>
-    // Function to show the image in full screen
-    function showFullScreen(imageUrl) {
-        // Open the image in a new window or tab in full screen
-        window.open(imageUrl, '_blank');
-    }
-</script>
-<style>* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: sans-serif;
-}
-
-main.table {
-    width: 82vw;
-    height: 90vh;
-    background-color: #fff5;
-    backdrop-filter: blur(7px);
-    box-shadow: 0 .4rem .8rem #0005;
-    border-radius: .8rem;
-    overflow: hidden;
-}
-
-.table__header {
-    width: 100%;
-    height: 10%;
-    background-color: #fff4;
-    padding: .8rem 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.table__header .input-group {
-    width: 35%;
-    height: 100%;
-    background-color: #fff5;
-    padding: 0 .8rem;
-    border-radius: 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: .2s;
-}
-
-.table__header .input-group:hover {
-    width: 45%;
-    background-color: #fff8;
-    box-shadow: 0 .1rem .4rem #0002;
-}
-
-.table__header .input-group img {
-    width: 1.2rem;
-    height: 1.2rem;
-}
-
-.table__header .input-group input {
-    width: 100%;
-    padding: 0 .5rem 0 .3rem;
-    background-color: transparent;
-    border: none;
-    outline: none;
-}
-
-.table__body {
-    width: 95%;
-    max-height: calc(89% - 1.6rem);
-    background-color: #fffb;
-    margin: .8rem auto;
-    border-radius: .6rem;
-    overflow: auto;
-    overflow: overlay;
-}
-
-.table__body::-webkit-scrollbar {
-    width: 0.5rem;
-    height: 0.5rem;
-}
-
-.table__body::-webkit-scrollbar-thumb {
-    border-radius: .5rem;
-    background-color: #0004;
-    visibility: hidden;
-}
-
-.table__body:hover::-webkit-scrollbar-thumb {
-    visibility: visible;
-}
-
-table {
-    width: 100%;
-}
-
-td img {
-    width: 36px;
-    height: 36px;
-    margin-right: .5rem;
-    border-radius: 50%;
-    vertical-align: middle;
-}
-
-table, th, td {
-    border-collapse: collapse;
-    padding: 1rem;
-    text-align: left;
-}
-
-thead th {
-    position: sticky;
-    top: 0;
-    left: 0;
-    background-color: #d5d1defe;
-    cursor: pointer;
-    text-transform: capitalize;
-}
-
-tbody tr:nth-child(even) {
-    background-color: #0000000b;
-}
-
-tbody tr {
-    --delay: .1s;
-    transition: .5s ease-in-out var(--delay), background-color 0s;
-}
-
-tbody tr:hover {
-    background-color: #fff6 !important;
-}
-
-tbody tr td,
-tbody tr td p,
-tbody tr td img {
-    transition: .2s ease-in-out;
-}
-
-.status {
-    padding: .4rem 0;
-    border-radius: 2rem;
-    text-align: center;
-}
-
-.status.delivered {
-    background-color: #86e49d;
-    color: #006b21;
-}
-
-.status.cancelled {
-    background-color: #d893a3;
-    color: #b30021;
-}
-
-.status.pending {
-    background-color: #ebc474;
-}
-
-.status.shipped {
-    background-color: #6fcaea;
-}
-
-@media (max-width: 1000px) {
-    td:not(:first-of-type) {
-        min-width: 12.1rem;
-    }
-}</style>
+    </script>
+</body>
+</html>

@@ -1,128 +1,280 @@
 <!DOCTYPE html>
-<html lang="he"> <!-- Added language attribute for Hebrew -->
+<html lang="he">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;600&display=swap');
+
         body {
-    background-image: url('/static/Images/drawable/login_bac.jpg');
-    background-size: cover;
-    background-position: center;
-    font-family: Arial, sans-serif;
-}
-
-
-        .container {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            font-family: 'Assistant', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            padding: 50px;
-            box-sizing: border-box;
+            animation: fadeInBody 1.5s ease;
         }
 
-        .card {
-            background-color: white;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
-            border-radius: 25px;
-            width: 339px;
-            height: 464px;
+        @keyframes fadeInBody {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .container {
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            justify-content: space-between;
+            width: 100%;
+            max-width: 400px;
             padding: 20px;
             box-sizing: border-box;
         }
 
+        .card {
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+            border-radius: 25px;
+            width: 100%;
+            padding: 30px;
+            box-sizing: border-box;
+            text-align: center;
+            animation: fadeInUp 1s ease-out;
+            transform: scale(0.95);
+            animation-fill-mode: forwards;
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         .card h1 {
-            background-color: #0000FF;
+            background-color: #007BFF;
             color: white;
-            font-size: 40px;
+            font-size: 32px;
             font-weight: bold;
             padding: 15px 30px;
-            border-radius: 50px;
-            margin-bottom: 10px;
-            text-align: center;
+            border-radius: 25px;
+            margin: -50px auto 20px;
+            width: max-content;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
         }
 
         .form-control {
             display: flex;
             align-items: center;
-            width: 100%;
-            height: 50px;
-            background-color: #F2F2F2;
+            background-color: #F7F7F7;
             border-radius: 25px;
             margin-bottom: 20px;
-            padding: 10px;
+            padding: 15px;
             box-sizing: border-box;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .form-control input {
             flex: 1;
             border: none;
             background-color: transparent;
-            margin-left: 10px;
+            margin-right: 10px;
             font-size: 16px;
+            padding: 5px;
+            outline: none;
+            direction: rtl;
+            color: #333;
+        }
+
+        .form-control input::placeholder {
+            color: #999;
+        }
+
+        .form-control input:focus {
+            background-color: #E8E8E8;
+            box-shadow: 0px 0px 10px rgba(0, 123, 255, 0.2);
+            border-radius: 25px;
         }
 
         .form-control i {
-            font-size: 20px;
-            color: #919191;
+            font-size: 18px;
+            color: #999;
+            margin-left: 10px;
         }
 
         .btn-container {
             display: flex;
             justify-content: space-between;
-            width: 100%;
+            margin-top: 20px;
         }
 
         .btn, .btnen {
             background-color: #FF5C5C;
             color: white;
-            font-size: 20px;
-            padding: 10px 20px;
+            font-size: 18px;
+            padding: 12px 0;
             border-radius: 25px;
             cursor: pointer;
             border: none;
-            margin-bottom: 10px;
-            width: 48%; /* Each button takes up about half the width */
+            width: 48%;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .btn:hover, .btnen:hover {
-            background-color: #FF3333; /* Darker shade for hover */
+            background-color: #FF3333;
+            transform: translateY(-2px);
+            box-shadow: 0px 5px 15px rgba(255, 83, 83, 0.4);
         }
 
         .card img {
             margin-top: 20px;
-            width: 100px;
-            height: 85px;
+            width: 120px;
+            height: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .card img:hover {
+            transform: scale(1.1);
+        }
+
+        .additional-options {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .additional-options a {
+            color: #007BFF;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .additional-options a:hover {
+            color: #0056b3;
+        }
+
+        .card footer {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .language-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .language-switcher button {
+            background: none;
+            border: 2px solid white;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .language-switcher button:hover {
+            background-color: white;
+            color: #007BFF;
+        }
+
+        @media (max-width: 600px) {
+            .card h1 {
+                font-size: 24px;
+                padding: 10px 20px;
+            }
+
+            .btn, .btnen {
+                font-size: 16px;
+                padding: 10px;
+            }
+
+            .card img {
+                width: 100px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="language-switcher">
+        <button onclick="switchLanguage()">עברית / English</button>
+    </div>
     <div class="container">
         <div class="card">
             <h1>שיעורי עזר</h1>
             <form action="/login" method="POST">
-    <div class="form-control">
-        <i class="fa fa-envelope"></i>
-        <input type="text" placeholder="תעודת זהות" name="username" required>
-    </div>
-    <div class="form-control">
-        <i class="fa fa-lock"></i>
-        <input type="password" placeholder="סיסמא" name="password" required>
-    </div>
-    <div class="btn-container">
-        <button class="btnen" type="submit">כניסה</button>
-        <button class="btn" type="button" onclick="location.href='/register'">הרשמה</button>
-    </div>
-</form>
-
+                <label class="form-control">
+                    <i class="fa fa-id-card"></i>
+                    <input type="text" placeholder="תעודת זהות" name="username" required>
+                </label>
+                <label class="form-control">
+                    <i class="fa fa-lock"></i>
+                    <input type="password" placeholder="סיסמא" name="password" required>
+                </label>
+                <div class="additional-options">
+                    <label>
+                        <input type="checkbox" name="remember" style="margin-right: 5px;"> זכור אותי
+                    </label>
+                    <br>
+                    <a href="/forgot-password">שכחת סיסמא?</a>
+                </div>
+                <div class="btn-container">
+                    <button class="btnen" type="submit">כניסה</button>
+                    <button class="btn" type="button" onclick="location.href='/register'">הרשמה</button>
+                </div>
+            </form>
             <img src="static/Images/about-logo.png" alt="Logo">
+            <footer>© 2024 כל הזכויות שמורות</footer>
         </div>
     </div>
+    <script>
+        function switchLanguage() {
+            const lang = document.documentElement.lang === "he" ? "en" : "he";
+            document.documentElement.lang = lang;
+            if (lang === "en") {
+                document.querySelector('h1').innerText = 'Tutoring';
+                document.querySelector('input[name="username"]').placeholder = 'ID Number';
+                document.querySelector('input[name="password"]').placeholder = 'Password';
+                document.querySelector('.btnen').innerText = 'Login';
+                document.querySelector('.btn').innerText = 'Register';
+                document.querySelector('.additional-options label').innerHTML = '<input type="checkbox" name="remember" style="margin-right: 5px;"> Remember me';
+                document.querySelector('.additional-options a').innerText = 'Forgot password?';
+                document.querySelector('footer').innerText = '© 2024 All rights reserved';
+            } else {
+                document.querySelector('h1').innerText = 'שיעורי עזר';
+                document.querySelector('input[name="username"]').placeholder = 'תעודת זהות';
+                document.querySelector('input[name="password"]').placeholder = 'סיסמא';
+                document.querySelector('.btnen').innerText = 'כניסה';
+                document.querySelector('.btn').innerText = 'הרשמה';
+                document.querySelector('.additional-options label').innerHTML = '<input type="checkbox" name="remember" style="margin-right: 5px;"> זכור אותי';
+                document.querySelector('.additional-options a').innerText = 'שכחת סיסמא?';
+                document.querySelector('footer').innerText = '© 2024 כל הזכויות שמורות';
+            }
+        }
+    </script>
 </body>
 </html>

@@ -1,109 +1,137 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Request a Class</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Class</title>
     <style>
-        /* Basic styling */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
+            margin: 20px;
+            background-color: #f4f4f4;
         }
-
-        form {
-            width: 50%;
-            margin: 40px auto;
+        .form-container {
+            max-width: 500px;
+            margin: auto;
+            background: #fff;
             padding: 20px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-
+        h1 {
+            text-align: center;
+            color: #333;
+        }
         label {
             display: block;
             margin-bottom: 8px;
-            font-weight: bold;
+            color: #333;
         }
-
-        input[type="date"], input[type="time"] {
+        input[type="text"], input[type="datetime-local"] {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             margin-bottom: 20px;
             border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
         }
-
-        button[type="submit"] {
-            background-color: #4CAF50;
+        input[type="text"]:focus, input[type="datetime-local"]:focus {
+            border-color: #28a745;
+            outline: none;
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.2);
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
             color: #fff;
-            padding: 10px 20px;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
+            transition: background-color 0.3s;
         }
-
-        button[type="submit"]:hover {
-            background-color: #3e8e41;
+        button:hover {
+            background-color: #218838;
+        }
+        .loading {
+            cursor: not-allowed;
+        }
+        .message {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
         }
     </style>
-
-    <script>
-        function syncEndDate() {
-            const startDate = document.getElementById('start-date');
-            const endDate = document.getElementById('end-date');
-            const startTime = document.getElementById('start-time');
-            const endTime = document.getElementById('end-time');
-
-            // Sync the date part of the end time with the start date
-            endDate.value = startDate.value;
-        }
-
-        function validateTimes() {
-            const startDate = document.getElementById('start-date').value;
-            const startTime = document.getElementById('start-time').value;
-            const endTime = document.getElementById('end-time').value;
-
-            // Get the current date in YYYY-MM-DD format
-            const currentDate = new Date().toISOString().split('T')[0];
-
-            // Validate that the start date is in the future
-            if (startDate < currentDate) {
-                alert('The start date must be in the future.');
-                return false;
-            }
-
-            // Validate that the end time is after the start time
-            if (endTime <= startTime) {
-                alert('End time must be after start time.');
-                return false;
-            }
-            return true;
-        }
-    </script>
 </head>
 <body>
-    <form method="POST" action="{{ url_for('RequestClass', elder_name=elder_name, elder_id=elder_id) }}" onsubmit="return validateTimes()">
-        <h2>Request a Class with {{ elder_name }}</h2>
-        
-        <label for="start-date">Start Date:</label>
-        <input type="date" id="start-date" name="date_start" onchange="syncEndDate()" required>
+    <div class="form-container">
+        <h1>Create a New Class</h1>
+        <form id="classForm">
+            <label for="student_username">Student Name:</label>
+            <input type="text" id="student_username" name="student_username" placeholder="Enter your name" required>
 
-        <label for="start-time">Start Time:</label>
-        <input type="time" id="start-time" name="start_time" required>
+            <label for="start-date">Start Date:</label>
+            <input type="datetime-local" id="start-date" name="dateStart" required>
 
-        <label for="end-time">End Time:</label>
-        <input type="time" id="end-time" name="end_time" required>
+            <label for="end-date">End Date:</label>
+            <input type="datetime-local" id="end-date" name="dateEnd" required>
 
-        <input type="hidden" id="end-date" name="date_end">
+            <button type="submit">Submit</button>
+        </form>
+        <div id="formMessage" class="message"></div>
+    </div>
 
-        <label for="notes">Additional Notes:</label>
-        <textarea id="notes" name="notes" rows="4"></textarea>
+    <script>
+        document.getElementById('classForm').addEventListener('submit', function(event) {
+            event.preventDefault();
 
-        <button type="submit">Submit</button>
-    </form>
+            // Disable button and show loading state
+            const submitButton = event.target.querySelector('button');
+            submitButton.disabled = true;
+            submitButton.classList.add('loading');
+            submitButton.textContent = 'Submitting...';
+
+            const studentUsername = document.getElementById('student_username').value;
+            const dateStart = document.getElementById('start-date').value;
+            const dateEnd = document.getElementById('end-date').value;
+
+            const data = {
+                student_username: studentUsername,
+                dateStart: dateStart,
+                dateEnd: dateEnd
+            };
+
+            fetch('/SendClass', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('formMessage').innerHTML = '<p class="success">Class added successfully!</p>';
+                console.log('Success:', data);
+                document.getElementById('classForm').reset(); // Clear form
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                document.getElementById('formMessage').innerHTML = '<p class="error">An error occurred while adding the class.</p>';
+            })
+            .finally(() => {
+                // Re-enable button and reset text
+                submitButton.disabled = false;
+                submitButton.classList.remove('loading');
+                submitButton.textContent = 'Submit';
+            });
+        });
+    </script>
 </body>
 </html>
