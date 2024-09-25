@@ -92,20 +92,28 @@ def saveRequest(profile_local_path, grades_local_path, id, name, password, type,
 
     return jsonify({'status': 'success', 'message': 'Request saved successfully.'})
 
-def handle_request(request_data,action):
+def handle_request(request_data, action):
     initFirebase()
+
+    # Delete the request from the 'Requests' reference
     db.reference('Requests').child(request_data['id']).delete()
-    # Perform your logic based on action ('accept' or 'cancel')
+
+    # Perform logic based on the action ('accept' or 'cancel')
     if action == 'accept':
         db.reference('Users').child(request_data['type']).child(request_data['id']).set(request_data)
-        # Handle accept logic
+        message = "Accepted request successfully!"
         print("Accepted request:", request_data)
     elif action == 'cancel':
-        # Handle cancel logic
+        message = "Cancelled request!"
         print("Cancelled request:", request_data)
 
-    # Return a response
-    return jsonify({'status': 'success', 'action': action})
+    # Pop-up message and return to the ListRequests page
+    return f'''
+        <script>
+            alert('{message}');
+            window.location.href = '/list_requests';  // Redirect to the ListRequests page
+        </script>
+    '''
 def get_all_requests():
             initFirebase()
             # Reference to the 'Requests' node in the database

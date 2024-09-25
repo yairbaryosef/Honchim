@@ -1,76 +1,203 @@
 <!DOCTYPE html>
 <html lang="he">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>דף הבית של חניך</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="מערכת שיעורי עזר - נועד לעזור לתלמידים ולחניכים למצוא תמיכה, גישה לשיעורים, ולארגן את זמנם בצורה טובה יותר">
+    <meta name="keywords" content="שיעורים, חונכים, תלמידים, חניכים, למידה">
+    <meta name="author" content="מערכת שיעורי עזר">
+    <title>מערכת שיעורי עזר</title>
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&display=swap">
+
     <style>
-        /* Reuse your initial styles */
+        /* Reset default browser styles */
         * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             text-decoration: none;
         }
-        .navbar {
-            background: crimson;
-            font-family: calibri;
-            padding-right: 15px;
-            padding-left: 15px;
+
+        body {
+            font-family: 'Alef', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
         }
+
+        /* Navbar */
+        .navbar {
+            background-color: #C62828;
+            padding: 15px 30px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
         .navdiv {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
         }
+
         .logo a {
-            font-size: 35px;
-            font-weight: 600;
+            font-size: 30px;
+            font-weight: bold;
             color: white;
         }
+
         ul {
-            padding: 0;
-            margin: 0;
-        }
-        li {
             list-style: none;
-            display: inline-block;
         }
+
+        li {
+            display: inline-block;
+            margin-right: 30px;
+        }
+
         li a {
             color: white;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            margin-right: 25px;
+            transition: color 0.3s ease, transform 0.3s ease;
         }
-        button {
-            background-color: black;
-            margin-left: 10px;
-            border-radius: 10px;
-            padding: 10px;
-            width: 90px;
-            border: none;
-        }
-        button a {
+
+        /* Logout Button - Using <a> instead of <button> */
+        .logout-btn {
+            background-color: #333;
             color: white;
+            padding: 10px 25px;
+            border-radius: 20px;
             font-weight: bold;
             font-size: 15px;
-            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
+
+        .logout-btn:hover {
+            background-color: #444;
+            transform: translateY(-3px);
+        }
+
+        /* Hover Effects */
+        li a:hover {
+            color: #f0f0f0;
+            transform: translateY(-3px);
+        }
+
+        /* Focus Styles for Accessibility */
+        a:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #C62828;
+        }
+
+        /* Home Content */
         .home-content {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 50px;
+            justify-content: center;
+            padding-top: 120px;
+            min-height: calc(100vh - 70px);
+            background-color: #fff;
+            text-align: center;
         }
+
         .home-title {
-            font-size: 40px;
+            font-size: 42px;
             font-weight: bold;
+            color: #C62828;
             margin-bottom: 20px;
         }
+
         .home-text {
-            font-size: 20px;
-            margin-bottom: 30px;
+            font-size: 18px;
+            color: #555;
+            max-width: 700px;
+            margin-bottom: 40px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            width: 100%;
+            bottom: 0;
+        }
+
+        footer a {
+            color: #C62828;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navdiv {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            li {
+                display: block;
+                margin: 10px 0;
+            }
+
+            .logo a {
+                font-size: 24px;
+            }
+
+            .home-title {
+                font-size: 34px;
+            }
+
+            .home-text {
+                font-size: 16px;
+                max-width: 90%;
+            }
+
+            .navdiv {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navdiv {
+                padding: 15px;
+            }
+
+            li {
+                margin-right: 15px;
+            }
+
+            .home-title {
+                font-size: 28px;
+            }
+
+            .home-text {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
+
+    <!-- Navbar -->
     <nav class="navbar">
         <div class="navdiv">
             <div class="logo"><a href="#">מערכת שיעורי עזר</a></div>
@@ -80,14 +207,29 @@
                 <li><a href="/search_elders">בחירת חונך</a></li>
                 <li><a href="/Classes">השיעורים שלי</a></li>
             </ul>
-            <button><a href="/logout">התנתקות</a></button>
+            <!-- Updated to an <a> styled as a button -->
+            <a href="/logout" class="logout-btn">התנתקות</a>
         </div>
     </nav>
 
+    <!-- Home Content -->
     <div class="home-content">
-        <h1 class="home-title">ברוך הבא, {{ name }}</h1>
-        <p class="home-text">כאן תוכל לגשת לשיעורים שלך, לחפש חונכים, ולצפות בשיעורים המתוזמנים שלך.</p>
+        <h1 class="home-title">ברוך הבא, יוסי</h1>
+        <p class="home-text">כאן תוכל לגשת לשיעורים שלך, לחפש חונכים, ולצפות בשיעורים המתוזמנים שלך.
+        האתר נועד להקל עליך למצוא תמיכה ולארגן את זמנך בצורה הטובה ביותר.</p>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        © 2024 מערכת שיעורי עזר. כל הזכויות שמורות.
+    </footer>
+
+    <!-- Dynamic Username Script (optional) -->
+    <script>
+        // Dynamic username logic (if pulling from the backend)
+        const userName = "יוסי";  // Example - replace with actual dynamic data
+        document.querySelector('.home-title').innerHTML = `ברוך הבא, ${userName}`;
+    </script>
 
 </body>
 </html>

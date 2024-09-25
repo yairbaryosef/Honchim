@@ -1,191 +1,217 @@
-<form action="{{ url_for('register2') }}" method="POST" enctype="multipart/form-data">
-  <meta charset="UTF-8">
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign as Cadet or Elder</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            font-family: 'Open Sans', sans-serif;
+            direction: rtl;
+        }
 
-  <label for="type">Type:</label>
-  <select id="type" name="type">
-    <option value="חניך">חניך</option>
-    <option value="חונך">חונך</option>
-  </select>
+        .navbar {
+            background: crimson;
+            font-family: calibri;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
 
-  <label for="year">Year:</label>
-  <input type="number" id="year" name="year" placeholder="Enter your year">
+        .navdiv {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-  <label for="degree">Degree:</label>
-  <input type="text" id="degree" name="degree" placeholder="Enter your degree">
+        .logo a {
+            font-size: 35px;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+        }
 
-  <label for="university">University:</label>
-  <select id="university" name="university">
-    <!-- options will be populated dynamically -->
-  </select>
-  <button type="button" id="add-university">Add University</button>
+        button {
+            background-color: black;
+            margin-left: 10px;
+            border-radius: 10px;
+            padding: 10px;
+            width: 100px;
+            border: none;
+            cursor: pointer;
+        }
 
-  <label for="phone">Phone:</label>
-  <input type="tel" id="phone" name="phone" placeholder="Enter your phone number">
+        button a {
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+            text-decoration: none;
+        }
 
-  <label for="help">Help:</label>
-  <select id="help" name="help">
-    <!-- options will be populated dynamically -->
-  </select>
-  <button type="button" id="add-help">Add Help</button>
+        /* Form styling */
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
 
-  <label for="profile-picture">Profile Picture:</label>
-  <input type="file" id="profile-picture" name="profile-picture" accept="image/*">
+        label {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: crimson;
+        }
 
-  <label for="grades">Grades:</label>
-  <input type="file" id="grades" name="grades" accept="image/*">
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
 
-  <label for="description">Description:</label>
-  <textarea id="description" name="description" placeholder="Tell us about yourself"></textarea>
+        input[type="file"] {
+            padding: 3px;
+        }
 
-  <button type="submit">Submit</button>
-</form>
+        button[type="submit"] {
+            width: 100%;
+            background-color: crimson;
+            color: white;
+            font-size: 18px;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
 
-<script>
-  const universitySelect = document.getElementById('university');
-  const helpSelect = document.getElementById('help');
+        button[type="submit"]:hover {
+            background-color: darkred;
+        }
 
-  // populate university options
-  const universities = ['University 1', 'University 2', 'University 3'];
-  universities.forEach(university => {
-    const option = document.createElement('option');
-    option.value = university;
-    option.text = university;
-    universitySelect.appendChild(option);
-  });
+        .custom-button {
+            background-color: black;
+            color: white;
+            padding: 10px;
+            margin-top: -10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
 
-  // populate help options
-  const helps = ['Help 1', 'Help 2', 'Help 3'];
-  helps.forEach(help => {
-    const option = document.createElement('option');
-    option.value = help;
-    option.text = help;
-    helpSelect.appendChild(option);
-  });
+        @media (max-width: 600px) {
+            .form-container {
+                padding: 20px;
+            }
 
-  // add event listeners to add university and help options
-  document.getElementById('add-university').addEventListener('click', () => {
-    const newUniversity = prompt('Enter new university:');
-    if (newUniversity) {
-      const option = document.createElement('option');
-      option.value = newUniversity;
-      option.text = newUniversity;
-      universitySelect.appendChild(option);
-    }
-  });
+            label {
+                font-size: 16px;
+            }
 
-  document.getElementById('add-help').addEventListener('click', () => {
-    const newHelp = prompt('Enter new help:');
-    if (newHelp) {
-      const option = document.createElement('option');
-      option.value = newHelp;
-      option.text = newHelp;
-      helpSelect.appendChild(option);
-    }
-  });
-</script>
+            input, select, textarea {
+                font-size: 14px;
+            }
 
-<style>
-  /* Body and form styling */
-  body {
-    font-family: 'Arial', sans-serif;
-    background-image: url('../Images/login_bac.jpg');
-    background-size: cover;
-    background-position: center;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-  }
+            button[type="submit"] {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navdiv">
+            <div class="logo"><a href="#">מערכת שיעורי עזר</a></div>
+            <button><a href="/logout">התנתקות</a></button>
+        </div>
+    </nav>
 
-  form {
-    max-width: 400px;
-    width: 100%;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-  }
+    <div class="form-container">
+        <form action="{{ url_for('register2') }}" method="POST" enctype="multipart/form-data">
+            <label for="type">סוג:</label>
+            <select id="type" name="type">
+                <option value="חניך">חניך</option>
+                <option value="חונך">חונך</option>
+            </select>
 
-  label {
-    font-weight: bold;
-    margin-bottom: 5px;
-    display: block;
-    color: #333;
-  }
+            <label for="year">שנה:</label>
+            <input type="number" id="year" name="year" placeholder="הזן את שנת הלימודים שלך">
 
-  input, select, textarea {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    font-size: 16px;
-    transition: border-color 0.3s;
-  }
+            <label for="degree">תואר:</label>
+            <input type="text" id="degree" name="degree" placeholder="הזן את התואר שלך">
 
-  input:focus, select:focus, textarea:focus {
-    border-color: #4CAF50;
-    outline: none;
-  }
+            <label for="university">אוניברסיטה:</label>
+            <select id="university" name="university"></select>
+            <button type="button" id="add-university" class="custom-button">הוסף מוסד לימוד</button>
 
-  button[type="button"], button[type="submit"] {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-  }
+            <label for="phone">טלפון:</label>
+            <input type="tel" id="phone" name="phone" placeholder="הזן את מספר הטלפון שלך">
 
-  button[type="button"]:hover, button[type="submit"]:hover {
-    background-color: #45a049;
-    transform: translateY(-2px);
-  }
+            <label for="help">עזרה:</label>
+            <select id="help" name="help"></select>
+            <button type="button" id="add-help" class="custom-button">הוסף עזרה</button>
 
-  button[type="button"]:focus, button[type="submit"]:focus {
-    outline: none;
-  }
+            <label for="profile-picture">תמונת פרופיל:</label>
+            <input type="file" id="profile-picture" name="profile-picture" accept="image/*">
 
-  @media (max-width: 600px) {
-    form {
-      padding: 15px;
-    }
+            <label for="grades">ציונים:</label>
+            <input type="file" id="grades" name="grades" accept=".pdf">
 
-    label {
-      font-size: 14px;
-    }
+            <label for="description">תיאור:</label>
+            <textarea id="description" name="description" placeholder="ספר לנו על עצמך"></textarea>
 
-    input, select, textarea {
-      font-size: 14px;
-      padding: 8px;
-    }
+            <button type="submit">שלח</button>
+        </form>
+    </div>
 
-    button[type="button"], button[type="submit"] {
-      font-size: 14px;
-      padding: 8px 12px;
-    }
-  }
+    <script>
+        const universitySelect = document.getElementById('university');
+        const helpSelect = document.getElementById('help');
 
-  @media (max-width: 400px) {
-    form {
-      padding: 10px;
-    }
+        // populate university options
+        const universities = ['University 1', 'University 2', 'University 3'];
+        universities.forEach(university => {
+            const option = document.createElement('option');
+            option.value = university;
+            option.text = university;
+            universitySelect.appendChild(option);
+        });
 
-    label {
-      font-size: 12px;
-    }
+        // populate help options
+        const helps = ['Help 1', 'Help 2', 'Help 3'];
+        helps.forEach(help => {
+            const option = document.createElement('option');
+            option.value = help;
+            option.text = help;
+            helpSelect.appendChild(option);
+        });
 
-    input, select, textarea {
-      font-size: 12px;
-      padding: 6px;
-    }
+        // add event listeners to add university and help options
+        document.getElementById('add-university').addEventListener('click', () => {
+            const newUniversity = prompt('הזן מוסד לימוד חדש:');
+            if (newUniversity) {
+                const option = document.createElement('option');
+                option.value = newUniversity;
+                option.text = newUniversity;
+                universitySelect.appendChild(option);
+            }
+        });
 
-    button[type="button"], button[type="submit"] {
-      font-size: 12px;
-      padding: 6px 10px;
-    }
-  }
-</style>
+        document.getElementById('add-help').addEventListener('click', () => {
+            const newHelp = prompt('הזן עזרה חדשה:');
+            if (newHelp) {
+                const option = document.createElement('option');
+                option.value = newHelp;
+                option.text = newHelp;
+                helpSelect.appendChild(option);
+            }
+        });
+    </script>
+</body>
+</html>

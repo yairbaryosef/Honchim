@@ -6,7 +6,7 @@
     <meta name="description" content="מערכת שיעורי עזר - נועד לעזור לתלמידים ולחניכים למצוא תמיכה, גישה לשיעורים, ולארגן את זמנם בצורה טובה יותר">
     <meta name="keywords" content="שיעורים, חונכים, תלמידים, חניכים, למידה">
     <meta name="author" content="מערכת שיעורי עזר">
-    <title>השיעורים שלי</title>
+    <title>מערכת שיעורי עזר</title>
 
     <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&display=swap">
@@ -69,7 +69,7 @@
             transition: color 0.3s ease, transform 0.3s ease;
         }
 
-        /* Logout Button */
+        /* Logout Button - Using <a> instead of <button> */
         .logout-btn {
             background-color: #333;
             color: white;
@@ -94,8 +94,14 @@
             transform: translateY(-3px);
         }
 
-        /* My Classes Content */
-        .my-classes-content {
+        /* Focus Styles for Accessibility */
+        a:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #C62828;
+        }
+
+        /* Home Content */
+        .home-content {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -106,97 +112,18 @@
             text-align: center;
         }
 
-        .classes-title {
+        .home-title {
             font-size: 42px;
             font-weight: bold;
             color: #C62828;
             margin-bottom: 20px;
         }
 
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Makes all cards equal size */
-            gap: 20px;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .class-card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .class-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            transform: translateY(-5px);
-        }
-
-        .class-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .class-header .class-number {
-            background-color: #C62828;
-            color: white;
-            font-size: 20px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .class-header .class-title {
+        .home-text {
             font-size: 18px;
-            font-weight: bold;
-        }
-
-        .class-dates {
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        .action-btn-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .action-btn {
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .accept-btn {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .cancel-btn {
-            background-color: #e74c3c;
-            color: white;
-        }
-
-        .accept-btn:hover {
-            background-color: #45a049;
-        }
-
-        .cancel-btn:hover {
-            background-color: #d1392b;
+            color: #555;
+            max-width: 700px;
+            margin-bottom: 40px;
         }
 
         /* Footer */
@@ -235,16 +162,17 @@
                 font-size: 24px;
             }
 
-            .classes-title {
+            .home-title {
                 font-size: 34px;
             }
 
-            .class-header {
-                flex-direction: column;
+            .home-text {
+                font-size: 16px;
+                max-width: 90%;
             }
 
-            .class-number {
-                margin-bottom: 10px;
+            .navdiv {
+                padding: 20px;
             }
         }
 
@@ -257,8 +185,12 @@
                 margin-right: 15px;
             }
 
-            .classes-title {
+            .home-title {
                 font-size: 28px;
+            }
+
+            .home-text {
+                font-size: 14px;
             }
         }
     </style>
@@ -270,47 +202,34 @@
         <div class="navdiv">
             <div class="logo"><a href="#">מערכת שיעורי עזר</a></div>
             <ul>
-                <li><a href="/HomePage">דף הבית</a></li>
-                <li><a href="#">אודות</a></li>
-                <li><a href="/search_elders">בחירת חונך</a></li>
-                <li><a href="/Classes">השיעורים שלי</a></li>
+                <li><a href="#">דף הבית</a></li>
+               <li><a href="/list_requests">אישור חונכים וחניכים</a></li>
+               <li><a href="/Over_50_hours">אישור שעות</a></li>
+
+
             </ul>
+            <!-- Updated to an <a> styled as a button -->
             <a href="/logout" class="logout-btn">התנתקות</a>
         </div>
     </nav>
 
-    <!-- My Classes Content -->
-    <div class="my-classes-content">
-        <h1 class="classes-title">השיעורים שלי</h1>
+    <!-- Home Content -->
+    <div class="home-content">
+        <h1 class="home-title">ברוך הבא, אדמין</h1>
 
-        <!-- Class Cards Grid -->
-        <div class="card-grid">
-            {% for item in items %}
-                <div class="class-card">
-                    <div class="class-header">
-                        <div class="class-number">{{ loop.index }}</div>
-                        <div class="class-title">{{ item.teacher }}</div>
-                    </div>
-                    <div class="class-dates">{{ item.dateStart }} - {{ item.dateEnd }}</div>
-                    <div class="action-btn-container">
-                        <a class="action-btn accept-btn"
-                           href="/handle_ClassAccept/accept?request={{ item | tojson | urlencode }}">
-                            Accept
-                        </a>
-                        <a class="action-btn cancel-btn"
-                           href="/handle_ClassAccept/cancel?request={{ item | tojson | urlencode }}">
-                            Cancel
-                        </a>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
     </div>
 
     <!-- Footer -->
     <footer>
         © 2024 מערכת שיעורי עזר. כל הזכויות שמורות.
     </footer>
+
+    <!-- Dynamic Username Script (optional) -->
+    <script>
+        // Dynamic username logic (if pulling from the backend)
+        const userName = "אדמין";  // Example - replace with actual dynamic data
+        document.querySelector('.home-title').innerHTML = `ברוך הבא, ${userName}`;
+    </script>
 
 </body>
 </html>

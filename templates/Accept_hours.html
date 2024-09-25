@@ -217,39 +217,23 @@
                 <thead>
                     <tr>
                         <th>תעודת זהות</th>
-                        <th>סוג</th>
-                        <th>שנה</th>
-                        <th>תואר</th>
-                        <th>אוניברסיטה</th>
-                        <th>טלפון</th>
-                        <th>עזרה</th>
-                        <th>תיאור</th>
-                        <th>תמונת פרופיל</th>
-                        <th>ציונים</th>
+                        <th>שעות</th>
                     </tr>
                 </thead>
                 <tbody id="requestBody">
                     <!-- Dynamic Data Rows -->
-                    {% for request in requests %}
+                    {% for request in elders %}
                     <tr>
-                          <td data-label="תעודת זהות">{{ request.id }}</td>
-                        <td data-label="סוג">{{ request.type }}</td>
-                        <td data-label="שנה">{{ request.year }}</td>
-                        <td data-label="תואר">{{ request.degree }}</td>
-                        <td data-label="אוניברסיטה">{{ request.uni }}</td>
-                        <td data-label="טלפון">{{ request.phone }}</td>
-                        <td data-label="עזרה">{{ request.help }}</td>
-                        <td data-label="תיאור">{{ request.description }}</td>
-                        <td data-label="תמונת פרופיל"><img src='{{ request.profile_url }}' alt="Profile Picture" style="width: 40px; height: 40px; border-radius: 50%;"></td>
-                        <td data-label="ציונים"><a href="{{ request.grades_url }}" class="view-pdf">View PDF</a></td>
+                        <td data-label="תעודת זהות">{{ request.id }}</td>
+                        <td data-label="שעות">{{ request.hours }}</td>
                     </tr>
                     <tr>
-                        <td colspan="9" style="text-align: center; padding: 20px;">
+                        <td colspan="2" style="text-align: center; padding: 20px;">
                             <div class="action-btn-container">
-                                <a class="action-btn accept-btn" href="/handle_request/accept?request={{ request | tojson | urlencode }}">
+                                <a class="action-btn accept-btn" href="/handle_hours_Approve/accept?request={{ request | tojson | urlencode }}">
                                     קבל
                                 </a>
-                                <a class="action-btn cancel-btn" href="/handle_request/cancel?request={{ request | tojson | urlencode }}">
+                                <a class="action-btn cancel-btn" href="/handle_hours_Approve/cancel?request={{ request | tojson | urlencode }}">
                                     בטל
                                 </a>
                             </div>

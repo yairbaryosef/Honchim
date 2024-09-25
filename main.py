@@ -57,8 +57,8 @@ def login():
             f.write(username)
 
         if username == 'Admin@' and password == 'Password123':
-            requests = PresenterSignIn.get_all_requests()
-            return render_template('ListRequests.html', requests=requests)
+
+            return render_template('AdminHomePage.html')
 
         user = db.reference('Users').child('חניך').child(username).get() or \
                db.reference('Users').child('חונך').child(username).get() or \
@@ -221,7 +221,12 @@ def contact_elder():
         data = json.load(f)
     # Log the ID for debugging
     db.reference('Users').child('חונך').child(elder_id).child('students').push(data['id'])
-    return f"הוסםת את עצמך בהצלחה למשתמש: {elder_id}"
+    return '''
+          <script>
+              alert('Contact successful! You will be redirected to the homepage.');
+              window.location.href = '/HomePage';  // Redirect to home page
+          </script>
+      '''
 
 # Send Class route
 @app.route('/RequestClass/<elder_name>/<elder_id>', methods=['GET', 'POST'])
@@ -365,14 +370,44 @@ def handle_ClassAccept(action):
 
         time_difference = date_end - date_start
         difference_in_hours = time_difference.total_seconds() / 3600
+        difference_in_hours = max(difference_in_hours, 0)
 
         PresenterSignIn.initFirebase()
         user = db.reference('Users').child('חונך').child(request_data['teacher']).get()
         user['hours'] = user.get('hours', 0) + difference_in_hours
 
         db.reference('Users').child('חונך').child(request_data['teacher']).set(user)
-        return jsonify(request_data), 200
+        return '''
+            <script>
+                alert('class accepted successfully!');
+                window.location.href = '/HomePage';  // Redirect to the HomePage
+            </script>
+        '''
+
     return jsonify({"error": "Invalid action"}), 400
+
+@app.route('/Admin_home', methods=['GET'])
+def redirect_to_admin():
+    return render_template('AdminHomePage.html')
+@app.route('/handle_hours_Approve/<action>', methods=['GET'])
+def handle_hours_Approve(action):
+    if action == "accept":
+        PresenterSignIn.initFirebase()
+        request_data = json.loads(request.args.get('request'))
+
+        user = db.reference('Users').child('חונך').child(request_data['id']).get()
+        user['hours'] = user['hours']-50
+
+        db.reference('Users').child('חונך').child(request_data['id']).set(user)
+        return '''
+            <script>
+                alert('user got his money successfully!');
+                window.location.href = '/Admin_home';  // Redirect to the HomePage
+            </script>
+        '''
+
+    return jsonify({"error": "Invalid action"}), 400
+
 
 def calculate_similarity(name, query):
     # Calculate similarity ratio using difflib
@@ -380,8 +415,30 @@ def calculate_similarity(name, query):
     return difflib.SequenceMatcher(None, name.lower(), query.lower()).ratio()
 
 # Handle cadet elder pairing
+@app.route('/list_requests', methods=['GET', 'POST'])
+def list_request():
+    requests = PresenterSignIn.get_all_requests()
+    return render_template('ListRequests.html', requests=requests)
+
+@app.route('/Over_50_hours', methods=['GET', 'POST'])
+def Over_50():
+    PresenterSignIn.initFirebase()
+    elders_ref = db.reference('Users').child('חונך')
+    elders = elders_ref.get()
+
+    # Convert the elders data into a list
+    elders_list = []
+    elders = [elder for elder in elders if elder is not None ]
+    print(elders)
+    if elders:
+        for e in elders:
+            elder = elders_ref.child(e).get()
+            elders_list.append(elder)
+    return render_template('Accept_hours.html', elders=elders_list)
+
 @app.route('/search_elders', methods=['GET', 'POST'])
 def search_elders():
+    PresenterSignIn.initFirebase()
     if 'id' not in session:
         return redirect(url_for('home'))
 
@@ -392,9 +449,11 @@ def search_elders():
     # Convert the elders data into a list
     elders_list = []
     elders = [elder for elder in elders if elder is not None]
+    print(elders)
     if elders:
-        for elder in elders:
-            if elder.get('type') == 'חונך' or True:
+        for e in elders:
+            elder=elders_ref.child(e).get()
+            if elder.get('type') == 'חונך':
                 elder_name = elder.get('name')
                 elder['first_name'] = elder_name.split(' ')[0] if elder_name else ''  
                 elders_list.append(elder)

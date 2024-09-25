@@ -1,142 +1,235 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he">
 <head>
     <meta charset="UTF-8">
-    <title>Registration - Step 1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="מערכת שיעורי עזר - הרשמת משתמש.">
+    <meta name="keywords" content="שיעורים, חונכים, תלמידים, הרשמה">
+    <meta name="author" content="מערכת שיעורי עזר">
+    <title>הרשמה - שלב 1</title>
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&display=swap">
+
     <style>
+        /* Reset default browser styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-decoration: none;
+        }
+
         body {
-            margin: 0;
-            padding: 0;
-            background-image: url('../Images/login_bac.jpg');
-            background-size: cover;
-            background-position: center;
-            font-family: 'Open Sans', sans-serif;
-        }
-
-        div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6,
-        pre, form, fieldset, input, textarea, p, blockquote, th, td {
-            padding: 0;
+            font-family: 'Alef', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            line-height: 1.6;
             margin: 0;
         }
 
-        fieldset, img { border: 0; }
-
-        ol, ul, li { list-style: none; }
-
-        :focus { outline: none; }
-
-        input,
-        textarea,
-        select {
-            font-family: 'Open Sans', sans-serif;
-            font-size: 16px;
-            color: #4c4c4c;
+        /* Navbar */
+        .navbar {
+            background-color: #C62828;
+            padding: 15px 30px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        p {
-            font-size: 12px;
-            width: 150px;
+        .navdiv {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo a {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            background-color: #333;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
             display: inline-block;
-            margin-left: 18px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #444;
+            transform: translateY(-3px);
+        }
+
+        /* Form Container */
+        .form-container {
+            max-width: 500px;
+            margin: 120px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
-            font-size: 32px;
-            font-weight: 300;
-            color: #4c4c4c;
             text-align: center;
-            padding-top: 10px;
-            margin-bottom: 10px;
+            color: #C62828;
+            font-size: 28px;
+            margin-bottom: 20px;
         }
 
-        .testbox {
-            margin: 20px auto;
-            width: 343px;
-            border-radius: 8px;
-            background-color: #ebebeb;
-            box-shadow: 1px 2px 5px rgba(0,0,0,.31);
-            border: solid 1px #cbc9c9;
-            padding: 20px;
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
         }
 
-        form {
-            margin: 0 30px;
-        }
-
-        hr {
-            color: #a9a9a9;
-            opacity: 0.3;
-        }
-
-        input[type=text], input[type=password] {
-            width: 200px;
-            height: 39px;
-            border-radius: 0px 4px 4px 0px;
-            background-color: #fff;
-            box-shadow: 1px 2px 5px rgba(0,0,0,.09);
-            border: solid 1px #cbc9c9;
-            margin-left: -5px;
-            margin-top: 13px;
-            padding-left: 10px;
-        }
-
-        input[type=password] {
-            margin-bottom: 25px;
-        }
-
-        #icon {
-            display: inline-block;
-            width: 30px;
-            background-color: #3a57af;
-            padding: 8px 0px 8px 15px;
-            margin-left: 15px;
-            border-radius: 4px 0px 0px 4px;
-            color: white;
-            box-shadow: 1px 2px 5px rgba(0,0,0,.09);
-        }
-
-        .button {
-            font-size: 14px;
-            font-weight: 600;
-            color: white;
-            padding: 6px 25px;
-            margin: 20px 8px 0 0;
-            display: inline-block;
-            float: right;
-            text-decoration: none;
-            width: 100px;
-            height: 35px;
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
             border-radius: 5px;
-            background-color: #3a57af;
-            box-shadow: 0 3px rgba(58,87,175,.75);
-            transition: all 0.1s linear 0s;
-            border: none;
-            cursor: pointer;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+            font-size: 16px;
         }
 
-        .button:hover {
-            top: 3px;
-            background-color: #2e458b;
-            box-shadow: none;
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: #28a745;
+            outline: none;
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .loading {
+            cursor: not-allowed;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .success {
+            color: green;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            width: 100%;
+            bottom: 0;
+        }
+
+        footer a {
+            color: #C62828;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navdiv {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .logo a {
+                font-size: 24px;
+            }
+
+            .form-container {
+                margin-top: 150px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navdiv {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            input[type="text"], input[type="password"] {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600' rel='stylesheet' type='text/css'>
-    <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
 
-    <div class="testbox">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navdiv">
+            <div class="logo"><a href="#">מערכת שיעורי עזר</a></div>
+            <a href="/logout" class="logout-btn">התנתקות</a>
+        </div>
+    </nav>
+
+    <!-- Form Container -->
+    <div class="form-container">
         <h1>הרשמת משתמש</h1>
         <form action="/register_step1" method="POST">
-            <hr>
-            <label id="icon" for="id"><i class="icon-envelope"></i></label>
-            <input type="text" name="id" id="id" placeholder="תעודת זהות" required/>
-            <label id="icon" for="name"><i class="icon-user"></i></label>
-            <input type="text" name="name" id="name" placeholder="שם ושם משפחה" required/>
-            <label id="icon" for="password"><i class="icon-shield"></i></label>
-            <input type="password" name="password" id="password" placeholder="סיסמא" required/>
-            <button type="submit" class="button">הבא</button>
+            <label for="id">תעודת זהות:</label>
+            <input type="text" name="id" id="id" placeholder="הכנס תעודת זהות" required>
+
+            <label for="name">שם מלא:</label>
+            <input type="text" name="name" id="name" placeholder="הכנס שם מלא" required>
+
+            <label for="password">סיסמא:</label>
+            <input type="password" name="password" id="password" placeholder="הכנס סיסמא" required>
+
+            <button type="submit">הבא</button>
         </form>
+        <div id="formMessage" class="message"></div>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        © 2024 מערכת שיעורי עזר. כל הזכויות שמורות.
+    </footer>
+
 </body>
 </html>

@@ -1,92 +1,272 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Class</title>
+    <meta name="description" content="מערכת שיעורי עזר - צור שיעור חדש.">
+    <meta name="keywords" content="שיעורים, חונכים, תלמידים, יצירת שיעור">
+    <meta name="author" content="מערכת שיעורי עזר">
+    <title>צור שיעור חדש</title>
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&display=swap">
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
+        /* Reset default browser styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-decoration: none;
         }
+
+        body {
+            font-family: 'Alef', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #C62828;
+            padding: 15px 30px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navdiv {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo a {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            display: inline-block;
+            margin-right: 30px;
+        }
+
+        li a {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            background-color: #333;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #444;
+            transform: translateY(-3px);
+        }
+
+        /* Hover Effects */
+        li a:hover {
+            color: #f0f0f0;
+            transform: translateY(-3px);
+        }
+
+        /* Form Container */
         .form-container {
             max-width: 500px;
-            margin: auto;
-            background: #fff;
-            padding: 20px;
+            margin: 100px auto;
+            background-color: white;
+            padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
+
         h1 {
             text-align: center;
-            color: #333;
+            color: #C62828;
+            font-size: 28px;
+            margin-bottom: 20px;
         }
+
         label {
             display: block;
             margin-bottom: 8px;
             color: #333;
+            font-weight: bold;
         }
+
         input[type="text"], input[type="datetime-local"] {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             margin-bottom: 20px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 5px;
             box-sizing: border-box;
             transition: border-color 0.3s;
+            font-size: 16px;
         }
+
         input[type="text"]:focus, input[type="datetime-local"]:focus {
             border-color: #28a745;
             outline: none;
             box-shadow: 0 0 8px rgba(40, 167, 69, 0.2);
         }
+
         button {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background-color: #28a745;
-            color: #fff;
+            color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
         }
+
         button:hover {
             background-color: #218838;
         }
+
         .loading {
             cursor: not-allowed;
         }
+
         .message {
             text-align: center;
             margin-top: 20px;
         }
+
         .error {
             color: red;
         }
+
         .success {
             color: green;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            width: 100%;
+            bottom: 0;
+        }
+
+        footer a {
+            color: #C62828;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navdiv {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            li {
+                display: block;
+                margin: 10px 0;
+            }
+
+            .logo a {
+                font-size: 24px;
+            }
+
+            .form-container {
+                margin-top: 150px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navdiv {
+                padding: 15px;
+            }
+
+            li {
+                margin-right: 15px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            input[type="text"], input[type="datetime-local"] {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <h1>Create a New Class</h1>
-        <form id="classForm" method="POST" action="/SendClass">
-            <label for="student_username">Student Name:</label>
-            <input type="text" id="student_username" name="student_username" placeholder="Enter your name" required>
 
-            <label for="start-date">Start Date:</label>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navdiv">
+            <div class="logo"><a href="#">מערכת שיעורי עזר</a></div>
+            <ul>
+                <li><a href="/HomePage">דף הבית</a></li>
+                <li><a href="#">אודות</a></li>
+                <li><a href="/manage_students">ניהול תלמידים</a></li>
+                <li><a href="/create_class">צור שיעור</a></li>
+            </ul>
+            <a href="/logout" class="logout-btn">התנתקות</a>
+        </div>
+    </nav>
+
+    <!-- Form Container -->
+    <div class="form-container">
+        <h1>צור שיעור חדש</h1>
+        <form id="classForm" method="POST" action="/SendClass">
+            <label for="student_username">שם התלמיד:</label>
+            <input type="text" id="student_username" name="student_username" placeholder="הכנס שם תלמיד" required>
+
+            <label for="start-date">תאריך התחלה:</label>
             <input type="datetime-local" id="start-date" name="dateStart" required>
 
-            <label for="end-date">End Date:</label>
+            <label for="end-date">תאריך סיום:</label>
             <input type="datetime-local" id="end-date" name="dateEnd" required>
 
-            <button type="submit">Submit</button>
+            <button type="submit">שלח</button>
         </form>
         <div id="formMessage" class="message"></div>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        © 2024 מערכת שיעורי עזר. כל הזכויות שמורות.
+    </footer>
 
     <script>
         document.getElementById('classForm').addEventListener('submit', function(event) {
@@ -96,7 +276,7 @@
             const submitButton = event.target.querySelector('button');
             submitButton.disabled = true;
             submitButton.classList.add('loading');
-            submitButton.textContent = 'Submitting...';
+            submitButton.textContent = 'שולח...';
 
             const studentUsername = document.getElementById('student_username').value;
             const dateStart = document.getElementById('start-date').value;
@@ -121,21 +301,20 @@
                 return response.json();
             })
             .then(data => {
-                document.getElementById('formMessage').innerHTML = '<p class="success">Class added successfully!</p>';
-                console.log('Success:', data);
+                document.getElementById('formMessage').innerHTML = '<p class="success">השיעור נוסף בהצלחה!</p>';
                 document.getElementById('classForm').reset(); // Clear form
             })
             .catch((error) => {
-                console.error('Error:', error);
-                document.getElementById('formMessage').innerHTML = '<p class="error">An error occurred while adding the class.</p>';
+                document.getElementById('formMessage').innerHTML = '<p class="error">אירעה שגיאה בהוספת השיעור.</p>';
             })
             .finally(() => {
                 // Re-enable button and reset text
                 submitButton.disabled = false;
                 submitButton.classList.remove('loading');
-                submitButton.textContent = 'Submit';
+                submitButton.textContent = 'שלח';
             });
         });
     </script>
+
 </body>
 </html>
