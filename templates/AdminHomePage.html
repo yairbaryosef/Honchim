@@ -203,9 +203,10 @@
             <div class="logo"><a href="#">מערכת שיעורי עזר</a></div>
             <ul>
                 <li><a href="#">דף הבית</a></li>
-                <li><a href="#">אודות</a></li>
-                <li><a href="/search_elders">בחירת חונך</a></li>
-                <li><a href="/Classes">השיעורים שלי</a></li>
+               <li><a href="/list_requests">אישור חונכים וחניכים</a></li>
+               <li><a href="/Over_50_hours">אישור שעות</a></li>
+
+
             </ul>
             <!-- Updated to an <a> styled as a button -->
             <a href="/logout" class="logout-btn">התנתקות</a>
@@ -214,9 +215,8 @@
 
     <!-- Home Content -->
     <div class="home-content">
-        <h1 class="home-title">ברוך הבא, {{name}}</h1>
-        <p class="home-text">כאן תוכל לגשת לשיעורים שלך, לחפש חונכים, ולצפות בשיעורים המתוזמנים שלך.
-        האתר נועד להקל עליך למצוא תמיכה ולארגן את זמנך בצורה הטובה ביותר.</p>
+        <h1 class="home-title">ברוך הבא, אדמין</h1>
+
     </div>
 
     <!-- Footer -->
@@ -227,7 +227,7 @@
     <!-- Dynamic Username Script (optional) -->
     <script>
         // Dynamic username logic (if pulling from the backend)
-        const userName = "יוסי";  // Example - replace with actual dynamic data
+        const userName = "אדמין";  // Example - replace with actual dynamic data
         document.querySelector('.home-title').innerHTML = `ברוך הבא, ${userName}`;
     </script>
 

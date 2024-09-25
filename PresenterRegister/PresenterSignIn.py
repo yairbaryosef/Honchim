@@ -1,10 +1,14 @@
+import json
+
+import bcrypt
 import firebase_admin
 from firebase_admin import credentials, db, storage
 from datetime import timedelta
 import os
-import PresenterRegister
+
 
 from flask import jsonify, render_template, url_for, redirect
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 def initFirebase():
@@ -74,6 +78,7 @@ def saveRequest(profile_local_path, grades_local_path, id, name, password, type,
     new_request_ref = db.reference('Requests').child(id)
     new_request_ref.set({
         'id': id,
+        'name': name,
         'type': type,
         'year': year,
         'degree': degree,
@@ -82,7 +87,8 @@ def saveRequest(profile_local_path, grades_local_path, id, name, password, type,
         'help': help,
         'description': description,
         'profile_url': profile_url,
-        'grades_url': grades_url
+        'grades_url': grades_url,
+        'num_of_grants': 0
     })
     print("Request saved successfully.")
 
@@ -92,20 +98,28 @@ def saveRequest(profile_local_path, grades_local_path, id, name, password, type,
 
     return jsonify({'status': 'success', 'message': 'Request saved successfully.'})
 
-def handle_request(request_data,action):
+def handle_request(request_data, action):
     initFirebase()
+
+    # Delete the request from the 'Requests' reference
     db.reference('Requests').child(request_data['id']).delete()
-    # Perform your logic based on action ('accept' or 'cancel')
+
+    # Perform logic based on the action ('accept' or 'cancel')
     if action == 'accept':
         db.reference('Users').child(request_data['type']).child(request_data['id']).set(request_data)
-        # Handle accept logic
+        message = "Accepted request successfully!"
         print("Accepted request:", request_data)
     elif action == 'cancel':
-        # Handle cancel logic
+        message = "Cancelled request!"
         print("Cancelled request:", request_data)
 
-    # Return a response
-    return jsonify({'status': 'success', 'action': action})
+    # Pop-up message and return to the ListRequests page
+    return f'''
+        <script>
+            alert('{message}');
+            window.location.href = '/list_requests';  // Redirect to the ListRequests page
+        </script>
+    '''
 def get_all_requests():
             initFirebase()
             # Reference to the 'Requests' node in the database
@@ -117,7 +131,7 @@ def get_all_requests():
             # Check if there are any requests
             if all_requests:
                 # Convert the data into a list of dictionaries (if needed)
-                requests_list = list(all_requests.values())
+                requests_list = list(all_requests)
             else:
                 requests_list = []
             return requests_list
@@ -143,11 +157,11 @@ def checkIfUserExist(username,password):
     if username=='Admin@' and password=='Password123':
 
             # For now, let's print the requests to the console (for debugging)
-            for request in  PresenterRegister.PresenterSignIn.get_all_requests():
+            for request in  get_all_requests():
                 print(request)
 
             # You can also pass the requests to a template to display them on a webpage
-            return render_template('ListRequests.html', requests=PresenterRegister.PresenterSignIn.get_all_requests())
+            return render_template('ListRequests.html', requests=get_all_requests())
     elif db.reference('חניך').child(username).get() is not None:
             # If user exists, save the username in a file and redirect to SignIn
 
@@ -159,16 +173,63 @@ def checkIfUserExist(username,password):
     else:
         # Handle the case where the user does not exist
         return redirect(url_for('SignIn'))
+from bcrypt import checkpw
+
+def encrypt_string(input_string: str) -> str:
+    """Encrypt a string using bcrypt hashing."""
+    # Generate a salt
+    salt = bcrypt.gensalt()
+
+    # Hash the input string with the generated salt
+    hashed_string = bcrypt.hashpw(input_string.encode(), salt)
+
+    # Return the hashed string as a UTF-8 encoded string
+    return hashed_string.decode('utf-8')
+
+
+
+def validate_string(input_string, hashed_string):
+    return checkpw(input_string.encode('utf-8'), hashed_string.encode('utf-8'))
+
+def validate_user(input_username: str, input_password: str) -> bool:
+    """Validate the user by checking if the input username and password are correct."""
+    # Encrypt the input username for lookup
+    initFirebase()
+
+
+    # Retrieve the user from Firebase based on the encrypted username
+    ref = db.reference('Usernames')
+    result = ref.get()
+    print(result)
+
+    if result:
+        # Extract the stored hashed passwords and usernames from the returned data
+        stored_data_list = list(result.values())
+        for stored_data in stored_data_list:
+            print(stored_data)
+            stored_password_hash = stored_data['password']
+            stored_user_hash = stored_data['username']
+
+            # Validate the input password and username
+            if validate_string(input_password, stored_password_hash) and validate_string(input_username,
+                                                                                         stored_user_hash):
+                print("User is valid!")
+                return True
+
+        # If no matches are found after looping through all stored data
+        print("Invalid details.")
+        return False
+    else:
+        print("User not found.")
+        return False
+
+
 if __name__ == '__main__':
-    # Example usage of saveRequest
-    saveRequest(
-        profile_local_path='/path/to/local/profile_picture.jpg',
-        grades_local_path='/path/to/local/grades.pdf',
-        type='חונך',
-        year=3,
-        degree='Computer Science',
-        uni='Ben Gurion University',
-        phone='1234567890',
-        help='Help with programming',
-        description='Looking for assistance in advanced algorithms.'
-    )
+    initFirebase()
+    for i in range(20):
+        username = str(i)
+        password = str(i)
+        username = encrypt_string(username)
+        password = encrypt_string(password)
+        obj = {"username": username, "password": password}
+        db.reference('Usernames').push(obj)

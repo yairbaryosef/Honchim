@@ -1,168 +1,316 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="מערכת שיעורי עזר - נועד לעזור לתלמידים ולחניכים למצוא תמיכה, גישה לשיעורים, ולארגן את זמנם בצורה טובה יותר">
+    <meta name="keywords" content="שיעורים, חונכים, תלמידים, חניכים, למידה">
+    <meta name="author" content="מערכת שיעורי עזר">
+    <title>השיעורים שלי</title>
 
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Title</title>
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alef:wght@400;700&display=swap">
+
+    <style>
+        /* Reset default browser styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-decoration: none;
+        }
+
+        body {
+            font-family: 'Alef', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #C62828;
+            padding: 15px 30px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navdiv {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo a {
+            font-size: 30px;
+            font-weight: bold;
+            color: white;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            display: inline-block;
+            margin-right: 30px;
+        }
+
+        li a {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            background-color: #333;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #444;
+            transform: translateY(-3px);
+        }
+
+        /* Hover Effects */
+        li a:hover {
+            color: #f0f0f0;
+            transform: translateY(-3px);
+        }
+
+        /* My Classes Content */
+        .my-classes-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 120px;
+            min-height: calc(100vh - 70px);
+            background-color: #fff;
+            text-align: center;
+        }
+
+        .classes-title {
+            font-size: 42px;
+            font-weight: bold;
+            color: #C62828;
+            margin-bottom: 20px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Makes all cards equal size */
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .class-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .class-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .class-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .class-header .class-number {
+            background-color: #C62828;
+            color: white;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .class-header .class-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .class-dates {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .action-btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .accept-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .cancel-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .accept-btn:hover {
+            background-color: #45a049;
+        }
+
+        .cancel-btn:hover {
+            background-color: #d1392b;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            width: 100%;
+            bottom: 0;
+        }
+
+        footer a {
+            color: #C62828;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navdiv {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            li {
+                display: block;
+                margin: 10px 0;
+            }
+
+            .logo a {
+                font-size: 24px;
+            }
+
+            .classes-title {
+                font-size: 34px;
+            }
+
+            .class-header {
+                flex-direction: column;
+            }
+
+            .class-number {
+                margin-bottom: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navdiv {
+                padding: 15px;
+            }
+
+            li {
+                margin-right: 15px;
+            }
+
+            .classes-title {
+                font-size: 28px;
+            }
+        }
+    </style>
 </head>
 <body>
 
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navdiv">
+            <div class="logo"><a href="#">מערכת שיעורי עזר</a></div>
+            <ul>
+                <li><a href="/HomePage">דף הבית</a></li>
+                <li><a href="#">אודות</a></li>
+                <li><a href="/search_elders">בחירת חונך</a></li>
+                <li><a href="/Classes">השיעורים שלי</a></li>
+            </ul>
+            <a href="/logout" class="logout-btn">התנתקות</a>
+        </div>
+    </nav>
 
+    <!-- My Classes Content -->
+    <div class="my-classes-content">
+        <h1 class="classes-title">השיעורים שלי</h1>
 
-    <div class="center-container">
-        <h1>My classes</h1>
+        <!-- Class Cards Grid -->
+        <div class="card-grid">
+            {% for item in items %}
+                <div class="class-card">
+                    <div class="class-header">
+                        <div class="class-number">{{ loop.index }}</div>
+                        <div class="class-title">{{ item.teacher }}</div>
+                    </div>
+                    <div class="class-dates">{{ item.dateStart }} - {{ item.dateEnd }}</div>
+                    <div class="action-btn-container">
+                        <a class="action-btn accept-btn"
+                           href="/handle_ClassAccept/accept?request={{ item | tojson | urlencode }}">
+                            Accept
+                        </a>
+                        <a class="action-btn cancel-btn"
+                           href="/handle_ClassAccept/cancel?request={{ item | tojson | urlencode }}">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 
-     <ol id="my-list" role="list">
-    {% for item in items %}
-        <li style="--i: {{ loop.index }}">
-            <h3>{{ item.teacher }}</h3>
-            <p>{{ item.dateStart }}-{{ item.dateEnd }}</p>
-            <div class="action-btn-container" style="display: flex; gap: 10px; margin-top: 10px;">
-                <a class="action-btn accept-btn"
-                   href="/handle_ClassAccept/accept?request={{ item | tojson | urlencode }}"
-                   style="background-color: #4CAF50; color: #fff; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer;">
-                    Accept
-                </a>
-                <a class="action-btn cancel-btn"
-                   href="/handle_ClassAccept/cancel?request={{ item | tojson | urlencode }}"
-                   style="background-color: #e74c3c; color: #fff; border: none; padding: 10px 20px; font-size: 16px; cursor: pointer;">
-                    Cancel
-                </a>
-            </div>
-        </li>
-    {% endfor %}
-</ol>
-
-
-    <script>
-        // Get the list element
-        const list = document.getElementById("my-list");
-
-        // Set the --length CSS variable based on the length of the items array
-        list.style.setProperty("--length", {{ items|length }});
-    </script>
-
-<style>@import url("https://fonts.googleapis.com/css?family=Montserrat:400,700");
-
-* {
-	box-sizing: border-box;
-}
-
-
-body {
-	--h: 212deg;
-	--l: 43%;
-	--brandColor: hsl(var(--h), 71%, var(--l));
-	font-family: Montserrat, sans-serif;
-	margin: 0;
-	background-color: whitesmoke;
-}
-
-p {
-	margin: 0;
-	line-height: 1.6;
-}
-
-ol {
-	list-style: none;
-	counter-reset: list;
-	padding: 0 1rem;
-}
-
-li {
-	--stop: calc(100% / var(--length) * var(--i));
-	--l: 62%;
-	--l2: 88%;
-	--h: calc((var(--i) - 1) * (180 / var(--length)));
-	--c1: hsl(var(--h), 71%, var(--l));
-	--c2: hsl(var(--h), 71%, var(--l2));
-
-	position: relative;
-	counter-increment: list;
-	max-width: 45rem;
-	margin: 2rem auto;
-	padding: 2rem 1rem 1rem;
-	box-shadow: 0.1rem 0.1rem 1.5rem rgba(0, 0, 0, 0.3);
-	border-radius: 0.25rem;
-	overflow: hidden;
-	background-color: white;
-}
-
-li::before {
-	content: '';
-	display: block;
-	width: 100%;
-	height: 1rem;
-	position: absolute;
-	top: 0;
-	left: 0;
-	background: linear-gradient(to right, var(--c1) var(--stop), var(--c2) var(--stop));
-}
-
-h3 {
-	display: flex;
-	align-items: baseline;
-	margin: 0 0 1rem;
-	color: rgb(70 70 70);
-}
-
-h3::before {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	flex: 0 0 auto;
-	margin-right: 1rem;
-	width: 3rem;
-	height: 3rem;
-	content: counter(list);
-	padding: 1rem;
-	border-radius: 50%;
-	background-color: var(--c1);
-	color: white;
-}
-
-@media (min-width: 40em) {
-	li {
-		margin: 3rem auto;
-		padding: 3rem 2rem 2rem;
-	}
-
-	h3 {
-		font-size: 2.25rem;
-		margin: 0 0 2rem;
-	}
-
-	h3::before {
-		margin-right: 1.5rem;
-	}
-}
-.center-container {
-    display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    height: 10vh; /* Adjust height for the ellipse */
-    width: 100vw; /* Adjust width for the ellipse */
-    text-align: center; /* Center text inside the container */
-    background-color: white; /* White background for the ellipse */
-    border-radius: 50% / 30%; /* Creates an ellipse shape */
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* Optional shadow for depth */
-}
-
-.center-container h1 {
-    font-size: 40px;
-    font-weight: bold;
-
-}
-.description-container {
-    margin-bottom: 20px; /* add some space between description and action buttons */
-}
-
-.action-btn-container {
-    display: inline-block; /* make the action buttons inline */
-}
-</style>
+    <!-- Footer -->
+    <footer>
+        © 2024 מערכת שיעורי עזר. כל הזכויות שמורות.
+    </footer>
 
 </body>
 </html>

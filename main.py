@@ -5,7 +5,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 from werkzeug.utils import secure_filename
 import os
 import PresenterRegister.PresenterSignIn as PresenterSignIn
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 import traceback
 from flask import make_response
 import difflib
@@ -57,9 +57,14 @@ def login():
             f.write(username)
 
         if username == 'Admin@' and password == 'Password123':
-            requests = PresenterSignIn.get_all_requests()
-            return render_template('ListRequests.html', requests=requests)
 
+            session['id'] = username
+            session['name'] = 'Admin'
+            return render_template('AdminHomePage.html')
+
+        if not PresenterSignIn.validate_user(username, password):
+            return render_template('login.html', error="לא מורשה.")
+        
         user = db.reference('Users').child('חניך').child(username).get() or \
                db.reference('Users').child('חונך').child(username).get() or \
                db.reference('Users').child('מחכה לאישור').child(username).get()
@@ -77,6 +82,12 @@ def login():
         return redirect(url_for('HomePage'))
     
     return render_template('login.html')
+
+@app.route('/AdminHome', methods=['GET', 'POST'])
+def AdminHome():
+    if 'id' not in session or session['id'] != 'Admin@':
+        return redirect(url_for('home'))
+    return render_template('AdminHomePage.html')
         
 @app.route('/HomePage', methods=['GET', 'POST'])   
 def HomePage():
@@ -85,13 +96,12 @@ def HomePage():
     user = db.reference('Users').child('חניך').child(session['id']).get() or \
               db.reference('Users').child('חונך').child(session['id']).get() or \
                 db.reference('Users').child('מחכה לאישור').child(session['id']).get()
-    name = user.get('name')
+    name = user.get('name', "User")
 
-    if 'חניך' == user['type']:
-        return render_template('CadetHomePage.html', name = name)
-    # TODO: FINISH חונך
-    elif 'חונך' == user['type']:
-        return render_template('ElderHomePage.html')
+    if user['type'] == 'חניך':
+        return render_template('PendingHomePage.html', name=name)
+    elif user['type'] == 'חונך':
+        return render_template('ElderHomePage.html', name=name, hours=round(user.get('hours', 0),1))
     elif 'מחכה לאישור' == user['type']:
         IsPending = PresenterSignIn.checkIfUserRequestExist(session['id'])
         return render_template('PendingHomePage.html', name = name, status = IsPending)
@@ -125,12 +135,12 @@ def register1():
 def register2():
     if request.method == 'POST':
         try:
-            with open("DB/id.txt", 'r') as f:
+            with open("DB/id.txt", 'r') as f: #check
                 user=f.read()
             # Extract form data
             form_data = {
                 'id': user,
-                'name': "name",
+                'name': request.form['name'],
                 'password': "123",
                 'type': request.form['type'],
                 'year': request.form['year'],
@@ -178,9 +188,9 @@ def register2():
 
             # only for testing
             if type == 'חניך':
-                return render_template('PendingHomePage.html')
+                return render_template('PendingHomePage.html', name=form_data['name'])
             elif type == 'חונך':
-                return render_template('ElderHomePage.html')
+                return render_template('PendingHomePage.html', name=form_data['name'], hours = form_data.get('hours', 0) or 0)
             # End of testing
             return redirect(url_for('home'))
         except Exception:
@@ -188,7 +198,7 @@ def register2():
             return render_template('error.html', message="There was an error processing your registration.")
 
     print("Session data:", session)
-    return render_template('RegisterStep2.html')
+    return "register successful"
 
 
 
@@ -221,7 +231,12 @@ def contact_elder():
         data = json.load(f)
     # Log the ID for debugging
     db.reference('Users').child('חונך').child(elder_id).child('students').push(data['id'])
-    return f"הוסםת את עצמך בהצלחה למשתמש: {elder_id}"
+    return '''
+          <script>
+              alert('Contact successful! You will be redirected to the homepage.');
+              window.location.href = '/HomePage';  // Redirect to home page
+          </script>
+      '''
 
 # Send Class route
 @app.route('/RequestClass/<elder_name>/<elder_id>', methods=['GET', 'POST'])
@@ -365,14 +380,45 @@ def handle_ClassAccept(action):
 
         time_difference = date_end - date_start
         difference_in_hours = time_difference.total_seconds() / 3600
+        difference_in_hours = max(difference_in_hours, 0)
 
         PresenterSignIn.initFirebase()
         user = db.reference('Users').child('חונך').child(request_data['teacher']).get()
         user['hours'] = user.get('hours', 0) + difference_in_hours
 
         db.reference('Users').child('חונך').child(request_data['teacher']).set(user)
-        return jsonify(request_data), 200
+        return '''
+            <script>
+                alert('class accepted successfully!');
+                window.location.href = '/HomePage';  // Redirect to the HomePage
+            </script>
+        '''
+
     return jsonify({"error": "Invalid action"}), 400
+
+@app.route('/Admin_home', methods=['GET'])
+def redirect_to_admin():
+    return render_template('AdminHomePage.html')
+@app.route('/handle_hours_Approve/<action>', methods=['GET'])
+def handle_hours_Approve(action):
+    if action == "accept":
+        PresenterSignIn.initFirebase()
+        request_data = json.loads(request.args.get('request'))
+
+        user = db.reference('Users').child('חונך').child(request_data['id']).get()
+        user['hours'] = user['hours']-50
+        user['num_of_grants'] = user.get('num_of_grants', 0) + 1
+
+        db.reference('Users').child('חונך').child(request_data['id']).set(user)
+        return '''
+            <script>
+                alert('user got his money successfully!');
+                window.location.href = '/Admin_home';  // Redirect to the HomePage
+            </script>
+        '''
+
+    return jsonify({"error": "Invalid action"}), 400
+
 
 def calculate_similarity(name, query):
     # Calculate similarity ratio using difflib
@@ -380,8 +426,30 @@ def calculate_similarity(name, query):
     return difflib.SequenceMatcher(None, name.lower(), query.lower()).ratio()
 
 # Handle cadet elder pairing
+@app.route('/list_requests', methods=['GET', 'POST'])
+def list_request():
+    requests = PresenterSignIn.get_all_requests()
+    return render_template('ListRequests.html', requests=requests)
+
+@app.route('/Over_50_hours', methods=['GET', 'POST'])
+def Over_50():
+    PresenterSignIn.initFirebase()
+    elders_ref = db.reference('Users').child('חונך')
+    elders = elders_ref.get()
+
+    # Convert the elders data into a list
+    elders_list = []
+    elders = [elder for elder in elders if elder is not None ]
+    print(elders)
+    if elders:
+        for e in elders:
+            elder = elders_ref.child(e).get()
+            elders_list.append(elder)
+    return render_template('Accept_hours.html', elders=elders_list)
+
 @app.route('/search_elders', methods=['GET', 'POST'])
 def search_elders():
+    PresenterSignIn.initFirebase()
     if 'id' not in session:
         return redirect(url_for('home'))
 
@@ -392,9 +460,11 @@ def search_elders():
     # Convert the elders data into a list
     elders_list = []
     elders = [elder for elder in elders if elder is not None]
+    print(elders)
     if elders:
-        for elder in elders:
-            if elder.get('type') == 'חונך' or True:
+        for e in elders:
+            elder=elders_ref.child(e).get()
+            if elder.get('type') == 'חונך':
                 elder_name = elder.get('name')
                 elder['first_name'] = elder_name.split(' ')[0] if elder_name else ''  
                 elders_list.append(elder)
@@ -430,7 +500,9 @@ def search_elders():
     return render_template('CadetSearchForElder.html', elders=elders_list)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+        port = int(os.environ.get('PORT', 8080))
+        app.run(host='0.0.0.0', port=port)
+
 
 # Error handlers
 @app.errorhandler(404)
